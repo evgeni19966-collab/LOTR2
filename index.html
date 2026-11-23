@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поход в Средиземье — От Хоббитона до Мордора</title>
+<style>
+:root{--bg-deep:#0d1117;--bg-panel:#161b22;--bg-card:#1c2128;--border:#30363d;--gold:#c9a227;--gold-bright:#e8c547;--gold-dim:#8a7020;--text:#e6edf3;--text-dim:#8b949e;--text-muted:#6e7681;--hp:#3fb950;--stamina:#58a6ff;--hunger:#d29922;--xp:#a371f7;--danger:#f85149;--good:#3fb950;--story:#e8c547;--thought:#a5d6ff;--shadow:0 8px 24px rgba(0,0,0,.4);--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg-deep);color:var(--text);min-height:100vh;line-height:1.55}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(201,162,39,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(88,166,255,.04) 0%,transparent 50%);z-index:-1;pointer-events:none}
+#app{max-width:920px;margin:0 auto;padding:16px;min-height:100vh}
+.screen{animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(201,162,39,.3)}50%{box-shadow:0 0 18px rgba(201,162,39,.55)}}
+.low-hp .bar-fill.hp{animation:pulse 1.2s infinite}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;background:var(--bg-card);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:.95em;border-radius:8px;cursor:pointer;transition:all .2s}
+.btn:hover{border-color:var(--gold-dim);background:#21262d;transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,#3d2e0f,#5a4318);border-color:var(--gold);color:var(--gold-bright);font-weight:600}
+.btn.small{padding:5px 10px;font-size:.82em}
+.btn.choice{width:100%;text-align:left;justify-content:flex-start;margin-bottom:8px;padding:12px 16px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.title-wrap{text-align:center;padding:3vh 20px 40px;max-width:700px;margin:0 auto}
+.title-deco{height:2px;background:linear-gradient(90deg,transparent,var(--gold-dim),var(--gold),var(--gold-dim),transparent);margin:22px auto;width:70%;position:relative}
+.title-deco::before,.title-deco::after{content:'✦';position:absolute;top:50%;transform:translateY(-50%);color:var(--gold)}
+.title-deco::before{left:-12px}.title-deco::after{right:-12px}
+.title-main{font-size:clamp(1.8rem,5.5vw,2.9rem);color:var(--gold-bright);font-weight:normal;text-shadow:0 0 30px rgba(201,162,39,.35)}
+.title-sub{color:var(--text-dim);font-size:1.05em;margin-top:6px;font-style:italic}
+.title-lore{margin:22px 0;color:var(--text-dim)}.title-lore p{margin-bottom:10px}
+.panel{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:26px 28px;box-shadow:var(--shadow)}
+.form-label{display:block;color:var(--text-dim);margin-bottom:8px;font-size:.95em}
+input[type=text]{width:100%;max-width:300px;padding:12px 16px;background:var(--bg-deep);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:1.1em;text-align:center}
+input[type=text]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.15)}
+.trait-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+@media(max-width:560px){.trait-grid{grid-template-columns:1fr}}
+.trait-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;text-align:left}
+.trait-card:hover,.trait-card.selected{border-color:var(--gold);background:#1f2630;box-shadow:0 0 12px rgba(201,162,39,.2)}
+.trait-card h4{color:var(--gold-bright);font-weight:normal;margin-bottom:6px}
+.trait-card p{font-size:.88em;color:var(--text-dim)}
+.game-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.location-name{font-size:1.35em;color:var(--gold-bright)}
+.environment{display:flex;gap:10px;flex-wrap:wrap;font-size:.88em;color:var(--text-dim)}
+.environment span{background:var(--bg-card);padding:3px 10px;border-radius:20px;border:1px solid var(--border)}
+.path-progress{display:flex;align-items:center;gap:2px;margin-bottom:12px;overflow-x:auto;padding:6px 0}
+.path-step{flex:1;min-width:48px;text-align:center;font-size:.62em;color:var(--text-muted)}
+.path-step .dot{width:10px;height:10px;border-radius:50%;background:var(--border);margin:0 auto 3px;border:2px solid var(--bg-deep)}
+.path-step.done .dot{background:var(--gold-dim)}
+.path-step.current .dot{background:var(--gold);box-shadow:0 0 10px var(--gold);animation:glow 2s infinite}
+.path-step.current{color:var(--gold-bright);font-weight:600}
+.path-line{flex:0 0 8px;height:2px;background:var(--border);margin-bottom:14px}
+.path-step.done+.path-line{background:var(--gold-dim)}
+.act-badge{display:inline-block;background:var(--bg-card);border:1px solid var(--gold-dim);color:var(--gold);font-size:.75em;padding:2px 10px;border-radius:12px;margin-bottom:8px;letter-spacing:.04em}
+.status-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px 12px;background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px}
+.stat-label{display:flex;justify-content:space-between;font-size:.78em;color:var(--text-dim);margin-bottom:2px}
+.bar{height:7px;background:var(--bg-deep);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .45s}
+.bar-fill.hp{background:linear-gradient(90deg,#2ea043,#3fb950)}
+.bar-fill.stamina{background:linear-gradient(90deg,#1f6feb,#58a6ff)}
+.bar-fill.hunger{background:linear-gradient(90deg,#9e6a03,#d29922)}
+.bar-fill.xp{background:linear-gradient(90deg,#8957e5,#a371f7)}
+.condition{font-size:.82em;color:var(--text-dim);margin:6px 0 10px;padding:6px 10px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border)}
+.condition.warn{color:#d29922;border-color:#6a4a10}
+.condition.bad{color:var(--danger);border-color:#5c2b2b}
+.game-main{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
+.description p{margin-bottom:11px}
+.description p.flavor{color:var(--text-dim);font-style:italic;border-left:2px solid var(--gold-dim);padding-left:10px;margin-top:14px}
+.location-art{text-align:center;font-size:1.4em;letter-spacing:.1em;color:var(--gold-dim);margin-bottom:12px;opacity:.85}
+.actions{display:flex;flex-wrap:wrap;gap:9px}
+.action-btn{flex:1 1 140px}
+.game-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.game-bottom{grid-template-columns:1fr}}
+.inventory-box,.log-box{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px;max-height:200px;overflow-y:auto}
+.box-title{font-size:.82em;color:var(--gold);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+.inv-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.inv-item:last-child{border-bottom:none}
+.inv-icon{font-size:1.2em;width:26px;text-align:center}
+.inv-name{font-size:.93em}.inv-desc{display:block;font-size:.76em;color:var(--text-muted)}
+.inv-count{color:var(--text-dim);font-size:.88em;margin-left:auto}
+.log-entry{font-size:.86em;padding:4px 0;border-bottom:1px solid rgba(48,54,61,.5)}
+.log-entry.good{color:var(--good)}.log-entry.bad{color:var(--danger)}.log-entry.story{color:var(--story)}
+.log-entry.info{color:var(--text-dim)}.log-entry.combat{color:#79c0ff}.log-entry.thought{color:var(--thought);font-style:italic}
+.levelup-panel{text-align:center;padding:8px 0}
+.levelup-panel h3{color:var(--gold-bright);margin-bottom:6px;font-weight:normal}
+.levelup-panel .btn{margin:5px}
+.combat-arena{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:560px){.combat-arena{grid-template-columns:1fr}}
+.combatant{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.combatant.enemy{border-color:#5c2b2b;background:linear-gradient(180deg,#1a1212,#161b22)}
+.combatant h3{color:var(--gold-bright);font-weight:normal;margin-bottom:4px;font-size:1.15em}
+.enemy-art{text-align:center;font-size:2.3em;margin:6px 0}
+.enemy-desc{font-size:.86em;color:var(--text-dim);margin-bottom:10px;font-style:italic}
+.combat-actions{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
+.combat-log{background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px;max-height:170px;overflow-y:auto}
+.scene-wrap{max-width:680px;margin:3vh auto}
+.scene-text p{margin-bottom:14px;font-size:1.05em;line-height:1.7}
+.scene-choices{margin-top:20px}
+.end-wrap{max-width:680px;margin:3vh auto;text-align:center}
+.end-title{color:var(--gold-bright);font-size:1.85em;font-weight:normal;margin-bottom:4px}
+.end-subtitle{color:var(--text-dim);font-style:italic;margin-bottom:16px}
+.end-text p{margin-bottom:11px;color:var(--text);text-align:left}
+.end-stats{margin:18px 0;text-align:left;background:var(--bg-card);border-radius:8px;padding:12px 16px}
+.end-stats h4{color:var(--gold);margin-bottom:8px;font-weight:normal}
+.stat-row{display:flex;justify-content:space-between;padding:3px 0;font-size:.9em;border-bottom:1px solid var(--border)}
+.end-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.end-tag{background:var(--bg-card);border:1px solid var(--border);padding:4px 12px;border-radius:20px;font-size:.82em;color:var(--text-dim)}
+.key-list{text-align:left;margin:12px 0;padding:10px 14px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border);font-size:.9em}
+.key-list li{margin:4px 0 4px 18px;color:var(--text-dim)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal-panel{background:var(--bg-panel);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:24px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow)}
+.modal-panel h3{color:var(--gold-bright);font-weight:normal;margin-bottom:10px}
+.modal-panel p{color:var(--text-dim);margin-bottom:16px;font-size:.95em}
+.pixel-art{display:block;width:100%;height:auto;aspect-ratio:2/1;image-rendering:pixelated;image-rendering:crisp-edges;background:#000;border:2px solid var(--gold-dim);border-radius:6px;box-shadow:0 0 0 1px #000,0 6px 18px rgba(0,0,0,.5);margin-bottom:12px}
+.pixel-art.banner{margin-bottom:14px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== Pixel art engine (procedural, 220x110, ordered dithering) ===== */
+const PixelArt=(function(){
+'use strict';
+const W=220,H=110;
+const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const bay=(x,y)=>(BAY[((y|0)&3)*4+((x|0)&3)]+.5)/16;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const rc={};
+function rgb(c){if(typeof c!=='string')return c;if(rc[c])return rc[c];const n=parseInt(c.slice(1),16);return rc[c]=[(n>>16)&255,(n>>8)&255,n&255];}
+function mixc(a,b,t){a=rgb(a);b=rgb(b);return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
+function sample(stops,t){
+  if(t<=stops[0][0])return rgb(stops[0][1]);
+  for(let i=1;i<stops.length;i++){if(t<=stops[i][0]){const a=stops[i-1],b=stops[i];return mixc(a[1],b[1],(t-a[0])/(b[0]-a[0]||1));}}
+  return rgb(stops[stops.length-1][1]);
+}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash(x,y,s){let h=Math.imul(x|0,374761393)+Math.imul(y|0,668265263)+Math.imul(s|0,982451653)|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;}
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  const a=hash(xi,yi,s),b=hash(xi+1,yi,s),c=hash(xi,yi+1,s),d=hash(xi+1,yi+1,s);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+function fbm(x,y,s,o){o=o||4;let v=0,a=.5,f=1,t=0;for(let i=0;i<o;i++){v+=a*vn(x*f,y*f,s+i*17);t+=a;f*=2;a*=.5;}return v/t;}
+// ramp: array dark->light; v in 0..1; dithered pick
+function pick(ramp,v,x,y){const n=ramp.length;if(n===1)return rgb(ramp[0]);v=clamp(v,0,1)*(n-1);const lo=Math.floor(v);if(lo>=n-1)return rgb(ramp[n-1]);return rgb(ramp[(v-lo)>bay(x,y)?lo+1:lo]);}
+
+class Pic{
+  constructor(w,h){this.w=w||W;this.h=h||H;this.d=new Uint8ClampedArray(this.w*this.h*4);for(let i=3;i<this.d.length;i+=4)this.d[i]=255;}
+  clone(){const p=new Pic(this.w,this.h);p.d.set(this.d);return p;}
+  set(x,y,c){x=Math.floor(x);y=Math.floor(y);if(x<0||y<0||x>=this.w||y>=this.h)return;c=rgb(c);const i=(y*this.w+x)*4;this.d[i]=c[0];this.d[i+1]=c[1];this.d[i+2]=c[2];}
+  get(x,y){x=clamp(Math.floor(x),0,this.w-1);y=clamp(Math.floor(y),0,this.h-1);const i=(y*this.w+x)*4;return[this.d[i],this.d[i+1],this.d[i+2]];}
+  mixpx(x,y,c,a){x=Math.floor(x);y=Math.floor(y);if(x<0||y<0||x>=this.w||y>=this.h||a<=0)return;c=rgb(c);const i=(y*this.w+x)*4;this.d[i]+=(c[0]-this.d[i])*a;this.d[i+1]+=(c[1]-this.d[i+1])*a;this.d[i+2]+=(c[2]-this.d[i+2])*a;}
+  rect(x,y,w,h,c){for(let j=0;j<h;j++)for(let i=0;i<w;i++)this.set(x+i,y+j,c);}
+  rectR(x,y,w,h,ramp,o){o=o||{};for(let j=0;j<h;j++)for(let i=0;i<w;i++){const v=(o.v0??.5)+((o.lx??-1)*(i/w-.5))*(o.k??.5)+((o.ly??-1)*(j/h-.5))*(o.k2??.3)+(hash(x+i,y+j,o.seed||3)-.5)*(o.tex??.2);this.set(x+i,y+j,pick(ramp,v,x+i,y+j));}}
+  // vertical dithered gradient
+  grad(y0,y1,stops,bands,x0,x1){bands=bands||10;x0=x0||0;x1=x1==null?this.w:x1;for(let y=y0;y<y1;y++){const t=(y-y0)/Math.max(1,y1-y0-1);for(let x=x0;x<x1;x++){const s=t*bands,lo=Math.floor(s);const k=(s-lo)>bay(x,y)?lo+1:lo;this.set(x,y,sample(stops,clamp(k/bands,0,1)));}}}
+  line(x0,y0,x1,y1,c){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;for(;;){this.set(x0,y0,c);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}
+  thick(x0,y0,x1,y1,w,c){const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0),1);for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;for(let a=0;a<w;a++)for(let b=0;b<w;b++)this.set(x-w/2+a,y-w/2+b,typeof c==='function'?c(x,y):c);}}
+  poly(pts,fn){let ymin=1e9,ymax=-1e9;pts.forEach(p=>{if(p[1]<ymin)ymin=p[1];if(p[1]>ymax)ymax=p[1];});
+    for(let y=Math.max(0,Math.floor(ymin));y<=Math.min(this.h-1,Math.ceil(ymax));y++){const yc=y+.5,xs=[];
+      for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];if((a[1]<=yc&&b[1]>yc)||(b[1]<=yc&&a[1]>yc))xs.push(a[0]+(yc-a[1])/(b[1]-a[1])*(b[0]-a[0]));}
+      xs.sort((p,q)=>p-q);for(let k=0;k+1<xs.length;k+=2)for(let x=Math.round(xs[k]);x<Math.round(xs[k+1]);x++)this.set(x,y,typeof fn==='function'?fn(x,y):fn);}}
+  blob(cx,cy,rx,ry,ramp,o){o=o||{};const sd=o.seed||1,lx=o.lx??-.55,ly=o.ly??-.65,nz=o.noise??.2,sc=o.scale??.4,b=o.bias??.5,rough=o.rough||0;
+    for(let y=Math.floor(cy-ry-2);y<=Math.ceil(cy+ry+2);y++)for(let x=Math.floor(cx-rx-2);x<=Math.ceil(cx+rx+2);x++){
+      const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry,d=dx*dx+dy*dy;if(d>1+0)continue;
+      if(rough&&d>1-rough*vn(x*.5,y*.5,sd+3))continue;
+      const nzz=Math.sqrt(Math.max(0,1-d));let v=b-.12+(dx*lx+dy*ly)*.55+nzz*.22+(vn(x*sc,y*sc,sd)-.5)*nz*2;if(o.rim&&d>.78)v-=.12;
+      if(o.mask&&!o.mask(x,y))continue;
+      this.set(x,y,pick(ramp,v,x,y));}}
+  circle(cx,cy,r,c){this.blob(cx,cy,r,r,[c],{noise:0});}
+  glow(cx,cy,r,col,a){a=a==null?1:a;for(let y=Math.floor(cy-r);y<=Math.ceil(cy+r);y++)for(let x=Math.floor(cx-r);x<=Math.ceil(cx+r);x++){const d=Math.hypot(x-cx,y-cy)/r;if(d>=1)continue;const al=(1-d)*(1-d)*a*5;const lo=Math.floor(al);const k=lo+((al-lo)>bay(x,y)?1:0);if(k>0)this.mixpx(x,y,col,Math.min(.9,k/5));}}
+  fog(y0,y1,col,a,seed,sc){sc=sc||.06;for(let y=y0;y<y1;y++){const ft=1-Math.abs((y-(y0+y1)/2)/((y1-y0)/2));for(let x=0;x<this.w;x++){const n=fbm(x*sc,y*sc*2.4,seed,3);const al=(n*1.5-.35)*ft*a*5;if(al<=0)continue;const lo=Math.floor(al);const k=lo+((al-lo)>bay(x,y)?1:0);if(k>0)this.mixpx(x,y,col,Math.min(.85,k/5));}}}
+  clouds(y0,y1,ramp,seed,dens,sc,x0,x1){sc=sc||.05;x0=x0||0;x1=x1==null?this.w:x1;for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const n=fbm(x*sc,y*sc*2.2,seed,4);const ft=1-Math.abs((y-(y0+y1)/2)/((y1-y0)/2));if(n*ft*1.15<dens)continue;const e=(n*ft*1.15-dens)/(1-dens);const v=.75-((y-y0)/(y1-y0))*.45+(fbm(x*sc*3,y*sc*4,seed+9,2)-.5)*.5+e*.2;this.set(x,y,pick(ramp,v,x,y));}}
+  stars(n,seed,ymax,cols){const r=mulberry(seed);cols=cols||['#ffffff','#bcd4ff','#ffe8b0'];for(let i=0;i<n;i++){const x=Math.floor(r()*this.w),y=Math.floor(r()*ymax);this.set(x,y,cols[Math.floor(r()*cols.length)]);if(r()<.08){this.set(x+1,y,'#8aa0d0');this.set(x-1,y,'#8aa0d0');this.set(x,y+1,'#8aa0d0');this.set(x,y-1,'#8aa0d0');}}}
+  speckle(x0,y0,x1,y1,n,seed,cols){const r=mulberry(seed);for(let i=0;i<n;i++)this.set(x0+r()*(x1-x0),y0+r()*(y1-y0),cols[Math.floor(r()*cols.length)]);}
+  // jagged / smooth ridge. returns heights
+  ridge(o){const hs=[],{base,amp,scale,seed}=o;
+    for(let x=0;x<this.w;x++){let n=fbm(x*scale+seed*10,seed*3.3,seed,o.oct||4);if(o.sharp){n=1-Math.abs(n*2-1);n=Math.pow(n,o.sharp===true?1.6:o.sharp);}else n=n*1.3-.15;hs[x]=base-n*amp+(o.slope?o.slope*(x/this.w-.5):0);}
+    const bottom=o.bottom==null?this.h:o.bottom;
+    for(let x=0;x<this.w;x++){const h0=hs[x],sl=hs[Math.max(0,x-2)]-hs[Math.min(this.w-1,x+2)];
+      for(let y=Math.max(0,Math.ceil(h0));y<bottom;y++){const dep=y-h0,t=dep/Math.max(8,bottom-h0);
+        let v=(o.v0==null?.6:o.v0)-t*(o.vfall==null?.4:o.vfall)+(sl>.3?.2:sl<-.3?-.18:0)*(dep<(o.lit||16)?1:.4)+(vn(x*.3,y*.6,o.seed)-.5)*(o.tex==null?.3:o.tex);
+        if(dep<1.4)v+=.18;
+        let col=pick(o.ramp,v,x,y);
+        if(o.snowLine!=null&&y<o.snowLine+(vn(x*.18,y*.22,o.seed+9)-.5)*14)col=pick(['#9aa6c4','#dfe7f4','#ffffff'],.5+(sl>.2?.35:sl<-.2?-.3:0)+(vn(x*.5,y*.5,3)-.5)*.3,x,y);
+        this.set(x,y,col);}}
+    return hs;}
+  pine(x,by,h,w,ramp,seed){seed=seed||1;const th=Math.max(4,h/4);for(let r=0;r<h;r++){const y=by-h+r,tr=(r%th)/th,half=(r/h)*w/2*(.55+.45*tr)+.5;
+      for(let i=-Math.floor(half);i<=Math.floor(half);i++){const dx=i/Math.max(1,half);const v=.55-dx*.45+(tr-.5)*.25+(hash(x+i,y,seed)-.5)*.35;this.set(x+i,y,pick(ramp,v,x+i,y));}}
+    this.rect(x-.5,by,1.5,Math.max(1,h*.08),'#2a1a10');}
+  oak(x,by,r,ramp,seed,trunk){seed=seed||1;const th=trunk||r*.9;this.thick(x,by,x,by-th,Math.max(2,r*.28),(a,b)=>pick(['#2a1a10','#4a3220','#6a4a2c'],.4+(hash(a,b,seed)-.5)*.5,a,b));
+    this.thick(x,by-th*.7,x-r*.5,by-th-r*.4,Math.max(1,r*.14),'#3a2616');this.thick(x,by-th*.7,x+r*.5,by-th-r*.35,Math.max(1,r*.14),'#3a2616');
+    const cs=[[0,-th-r*.4,r,r*.8],[-r*.6,-th-r*.1,r*.7,r*.6],[r*.6,-th-r*.15,r*.7,r*.6],[-r*.25,-th-r*.8,r*.6,r*.5],[r*.3,-th-r*.75,r*.6,r*.5]];
+    cs.forEach((c,i)=>this.blob(x+c[0],by+c[1],c[2],c[3],ramp,{seed:seed+i,noise:.35,rough:.35,scale:.7}));}
+  bush(x,y,r,ramp,seed){this.blob(x,y,r,r*.7,ramp,{seed:seed||2,noise:.4,rough:.3,scale:.8});}
+  // darken/tint with light sources
+  light(lights,amb,tint){const A=Array.isArray(amb)?amb:[amb,amb,amb];const T=tint||[1,1,1];
+    for(let y=0;y<this.h;y++)for(let x=0;x<this.w;x++){let lr=0,lg=0,lb=0;
+      for(const L of lights){const d=Math.hypot(x-L.x,(y-L.y)*(L.sy||1))/L.r;if(d>=1)continue;const f=(1-d)*(1-d)*(L.i==null?1:L.i);const c=rgb(L.c);lr+=c[0]/255*f;lg+=c[1]/255*f;lb+=c[2]/255*f;}
+      const m=[A[0]+lr,A[1]+lg,A[2]+lb];const i=(y*this.w+x)*4;
+      for(let k=0;k<3;k++){const q=clamp(m[k],0,1.4)*10;const lo=Math.floor(q);const kk=(q-lo)>bay(x,y)?lo+1:lo;this.d[i+k]=clamp(this.d[i+k]*(kk/10)*T[k],0,255);}}}
+  toCanvas(cv){cv.width=this.w;cv.height=this.h;const ctx=cv.getContext('2d');const id=ctx.createImageData(this.w,this.h);id.data.set(this.d);ctx.putImageData(id,0,0);}
+}
+
+// ----- time of day / weather post-process (deterministic per seed) -----
+function atmosphere(src,time,weather,seed,opt){
+  opt=opt||{};const p=src.clone();const r=mulberry(seed||7);
+  const tint=opt.indoor?null:({day:null,evening:[1.0,.74,.6],night:[.34,.42,.74]})[time];
+  if(tint){for(let i=0;i<p.d.length;i+=4){const R=p.d[i],G=p.d[i+1],B=p.d[i+2];const warm=(R>200&&B<170&&R>B+50)?.55:0; // lamps and fire stay bright
+      p.d[i]=R*(tint[0]+(1-tint[0])*warm);p.d[i+1]=G*(tint[1]+(1-tint[1])*warm);p.d[i+2]=B*(tint[2]+(1-tint[2])*warm);}}
+  if(weather==='cloudy'||weather==='rain'||weather==='storm'||weather==='fog'){
+    const k=({cloudy:.2,rain:.35,storm:.5,fog:.15})[weather];
+    for(let i=0;i<p.d.length;i+=4){const g=(p.d[i]*.3+p.d[i+1]*.59+p.d[i+2]*.11);const dk=({cloudy:.9,rain:.78,storm:.62,fog:.95})[weather];
+      for(let c=0;c<3;c++)p.d[i+c]=(p.d[i+c]+(g-p.d[i+c])*k)*dk;}}
+  if(weather==='fog'){p.fog(10,p.h,'#b8c0c8',.9,seed+5,.05);p.fog(40,p.h,'#c4ccd2',.8,seed+9,.035);}
+  if(weather==='rain'||weather==='storm'){const n=weather==='storm'?170:100;for(let i=0;i<n;i++){const x=r()*p.w,y=r()*p.h,l=3+r()*3;for(let j=0;j<l;j++)p.mixpx(x-j*.5,y+j,'#c8d6ea',.55);}}
+  if(weather==='storm'&&r()<.35){const lx=r()*p.w;let x=lx,y=0;while(y<p.h*.6){p.set(x,y,'#ffffff');x+=(r()-.5)*5;y+=2;}for(let i=0;i<p.d.length;i+=4){p.d[i]=Math.min(255,p.d[i]+22);p.d[i+1]=Math.min(255,p.d[i+1]+22);p.d[i+2]=Math.min(255,p.d[i+2]+30);}}
+  return p;
+}
+
+const SCENES={};
+const cache={};
+function base(id){if(!cache[id]){const p=new Pic();const f=SCENES[id];if(f)f(p,{vn,fbm,hash,pick,mulberry,rgb,mixc,bay,clamp});cache[id]=p;}return cache[id];}
+function draw(cv,id,time,weather,seed){
+  if(!cv)return;const s=SCENES[id]||{};const meta=(PixelArt.meta||{})[id]||{};
+  let p=base(id);
+  if(time||weather)p=atmosphere(p,time,weather,seed||1,meta);
+  p.toCanvas(cv);
+}
+return{Pic,SCENES,draw,base,atmosphere,meta:{},util:{vn,fbm,hash,pick,mulberry,rgb,mixc,bay,clamp,sample},W,H};
+})();
+
+/* ===== Scenes part 1: Shire -> Rivendell ===== */
+(function(){
+const S=PixelArt.SCENES,M=PixelArt.meta,U=PixelArt.util;
+const {vn,fbm,hash,pick,mulberry,bay}=U;
+const GRASS=['#1f4a22','#2f6b2c','#4a8a3a','#7cb450','#b5d878'];
+const FAR=['#5a7f8c','#6f9a98','#88b4a4'];
+
+S.hobbiton=(p)=>{
+  p.grad(0,64,[[0,'#5b94d6'],[.5,'#9cc9ea'],[.85,'#f3ecc4'],[1,'#fbe0a0']],9);
+  p.clouds(6,38,['#c9d8ea','#eef3f6','#ffffff'],4,.56,.045);
+  p.glow(168,30,26,'#fff2b0',.8);p.circle(168,30,5,'#fffbe0');
+  p.ridge({base:62,amp:16,scale:.012,seed:3,ramp:FAR,v0:.7,vfall:.2,tex:.15});
+  p.fog(50,70,'#e8f0d8',.5,4,.05);
+  p.ridge({base:72,amp:12,scale:.02,seed:8,ramp:['#3f7a38','#5f9a46','#8cc060'],v0:.6,vfall:.3});
+  // big Party Tree
+  p.oak(176,86,24,['#16401c','#27642a','#3f8a36','#78b84c','#b4dc6a'],5,18);
+  // Bag End hill
+  p.blob(58,104,84,50,GRASS,{seed:6,noise:.25,scale:.25,lx:-.4,ly:-.8});
+  // door + frame
+  p.circle(58,80,11,'#5a3a1c');p.circle(58,80,10,'#7a5430');
+  p.blob(58,80,8.4,8.4,['#1f5a2a','#2e7a38','#4aa04a'],{noise:.15,lx:-.5,ly:-.5});
+  for(let i=-6;i<=6;i+=3)p.line(58+i,74+Math.abs(i)*.2,58+i,86-Math.abs(i)*.2,'#1a4a24');
+  p.rect(62,80,2,2,'#f6d65a');p.set(62,80,'#fff4a0');
+  p.rect(48,80,20,1,'#1a4a24');
+  // round window
+  p.circle(33,84,4.5,'#5a3a1c');p.circle(33,84,3.3,'#ffd86b');p.line(30,84,36,84,'#7a5430');p.line(33,81,33,87,'#7a5430');p.glow(33,84,10,'#ffd070',.5);
+  // chimney + smoke
+  p.rect(70,60,5,6,'#8a6a50');p.rect(69,59,7,2,'#a08060');
+  for(let i=0;i<6;i++)p.blob(73+i*3+vn(i,2,1)*2,56-i*4,2+i*.6,1.8+i*.5,['#9ca8b0','#c4ccd0','#e6eaec'],{seed:i,noise:.3,rough:.2});
+  // lane
+  p.poly([[54,92],[64,92],[94,110],[40,110]],(x,y)=>pick(['#8a6a44','#b08c5a','#d8bc80'],.5+(hash(x,y,5)-.5)*.6,x,y));
+  p.poly([[60,92],[63,92],[78,110],[70,110]],(x,y)=>pick(['#b08c5a','#d8bc80'],.6,x,y));
+  // fence
+  for(let i=0;i<9;i++){const x=96+i*7,y=96+i*1.6;p.rect(x,y-6,2,9,'#8a6a44');p.rect(x,y-6,1,9,'#b08c5a');}
+  p.line(96,93,152,102,'#8a6a44');p.line(96,96,152,105,'#8a6a44');
+  // flowers + tufts
+  p.speckle(0,92,220,110,120,9,['#e04a4a','#f6d65a','#ffffff','#e08ae0','#f6d65a']);
+  for(let i=0;i<90;i++){const x=hash(i,1,4)*220,y=88+hash(i,2,4)*22;p.line(x,y,x+(hash(i,3,4)-.5)*2,y-2-hash(i,5,4)*3,pick(GRASS,.3+hash(i,6,4)*.6,x,y));}
+};
+
+S.bree_road=(p)=>{
+  p.grad(0,70,[[0,'#232a66'],[.3,'#5f4a8e'],[.6,'#d0707e'],[.85,'#f5a85e'],[1,'#ffd890']],11);
+  p.clouds(8,40,['#6a4a82','#c0687e','#f6a070'],12,.5,.05);
+  p.glow(138,66,34,'#ffc070',.9);p.blob(138,68,9,9,['#ffd27a','#ffe9a8'],{noise:0,mask:(x,y)=>y<68});
+  p.ridge({base:64,amp:14,scale:.012,seed:21,ramp:['#3a2a56','#54407a','#7a5a90'],v0:.5,vfall:.1,tex:.1});
+  // Bree on the hill
+  p.blob(160,76,48,22,['#2a2440','#3d3458','#5a4a70'],{noise:.15});
+  const hs=[[148,64,6,5],[154,62,7,6],[161,63,5,5],[167,65,6,4],[173,66,5,4]];
+  hs.forEach(h=>{p.rect(h[0],h[1]+2,h[2],h[3],'#2a2038');p.poly([[h[0]-1,h[1]+2],[h[0]+h[2]/2,h[1]-2],[h[0]+h[2]+1,h[1]+2]],'#1c1428');p.set(h[0]+2,h[1]+4,'#ffd070');});
+  p.rect(140,66,6,6,'#2a2038');p.set(142,68,'#ffd070');
+  p.glow(158,64,18,'#ffb050',.35);
+  p.fog(56,76,'#c880a0',.5,3,.05);
+  // fields
+  p.ridge({base:72,amp:6,scale:.02,seed:33,ramp:['#6a4a28','#a8782e','#e0b048','#f6d070'],v0:.6,vfall:.35,tex:.4});
+  for(let y=76;y<110;y+=3)for(let x=0;x<220;x++){if(hash(x,y,8)<.12)p.set(x,y,pick(['#8a5a20','#e0b048','#f6d070'],hash(x,y,9),x,y));}
+  // road in perspective
+  p.poly([[136,70],[142,70],[200,110],[70,110]],(x,y)=>{const t=(y-70)/40;return pick(['#4a3224','#7a5a3c','#b08a5c','#d8b27a'],.35+t*.3+(hash(x,y,3)-.5)*.5,x,y);});
+  p.line(139,72,128,110,'#4a3224');p.line(140,72,160,110,'#4a3224');
+  // hedgerow trees along the road
+  for(let i=0;i<6;i++){const t=i/5,y=72+t*34,x=136-(14+t*70)*(1.0),s=3+t*9;p.oak(x,y,s,['#10201a','#1c3426','#2c4c30'],i+3,s*.7);const x2=142+(14+t*70);p.oak(x2,y,s,['#10201a','#1c3426','#2c4c30'],i+9,s*.7);}
+  p.speckle(0,96,220,110,60,5,['#1c3426','#2c4c30','#3c6a3a']);
+  [[40,22],[60,16],[90,26],[175,18]].forEach(b=>{p.line(b[0],b[1],b[0]+2,b[1]+1,'#2a2038');p.line(b[0]+2,b[1]+1,b[0]+4,b[1],'#2a2038');});
+};
+
+S.bree=(p)=>{
+  p.grad(0,70,[[0,'#050818'],[.6,'#10183a'],[1,'#26305a']],8);
+  p.stars(70,11,45);p.blob(188,16,7,7,['#c8d0e0','#fff8e0'],{noise:0});p.blob(191,14,6,6,['#0a1230'],{noise:0});
+  // side buildings (dark)
+  p.rect(0,48,34,62,'#161224');p.poly([[-2,50],[17,30],[36,50]],'#0e0a18');p.rect(8,66,6,8,'#ffc060');p.glow(11,70,14,'#ffa040',.4);
+  p.rect(190,44,30,66,'#161224');p.poly([[186,46],[206,26],[224,46]],'#0e0a18');p.rect(200,62,6,8,'#ffc060');p.glow(203,66,14,'#ffa040',.4);
+  // inn
+  p.rectR(52,60,116,50,['#4a4038','#6a5a4a','#8a7a64'],{seed:2,tex:.4,k:.3});
+  p.rectR(48,38,124,24,['#d8c8a0','#e8dcb8','#f4ecd0'],{seed:3,tex:.1,k:.2});
+  for(let x=48;x<172;x+=17)p.rect(x,38,2,24,'#2a1a10');p.rect(48,38,124,2,'#2a1a10');p.rect(48,60,124,3,'#2a1a10');p.rect(48,49,124,1,'#2a1a10');
+  p.poly([[40,40],[110,12],[180,40],[172,40],[110,19],[48,40]],'#2a2238');
+  p.poly([[40,40],[110,12],[180,40]],(x,y)=>pick(['#3a2a34','#5a3a40','#7a4a48'],.45+(hash(x,y,4)-.5)*.5+(y%4===0?-.15:0),x,y));
+  p.rect(138,6,8,16,'#5a4a44');p.rect(137,5,10,3,'#7a6a60');
+  for(let i=0;i<5;i++)p.blob(142+i*3,2-i*3,2+i,1.6+i*.5,['#2a3050','#3a4268'],{seed:i,rough:.2});
+  const win=(x,y)=>{p.rect(x,y,10,10,'#2a1a10');p.rect(x+1,y+1,8,8,'#ffc84a');p.rect(x+1,y+1,8,3,'#fff0a0');p.line(x+5,y+1,x+5,y+9,'#7a4a20');p.line(x+1,y+5,x+9,y+5,'#7a4a20');p.glow(x+5,y+14,22,'#ff9a30',.5);};
+  win(62,44);win(86,44);win(130,44);win(154,44);win(66,76);win(150,76);
+  // door
+  p.rect(100,68,20,42,'#2a1a10');p.poly([[100,70],[110,60],[120,70]],'#2a1a10');p.rect(102,72,16,38,'#ffb040');p.poly([[102,72],[110,63],[118,72]],'#ffb040');p.rect(102,72,16,6,'#ffe080');p.glow(110,88,36,'#ff9a30',.8);p.rect(109,72,2,38,'#2a1a10');
+  // hanging sign with a pony
+  p.line(40,52,56,52,'#2a1a10');p.line(48,52,48,56,'#2a1a10');p.rect(36,56,24,18,'#2a1a10');p.rect(37,57,22,16,'#d8c890');
+  p.poly([[42,70],[44,62],[47,60],[50,62],[54,60],[52,66],[50,70],[48,67],[45,70]],'#3a2410');p.glow(48,66,24,'#ffb050',.4);
+  // lanterns
+  [[92,60],[130,60]].forEach(l=>{p.rect(l[0],l[1],3,5,'#ffd870');p.glow(l[0]+1,l[1]+2,14,'#ffb040',.7);});
+  // cobbles
+  for(let y=94;y<110;y++)for(let x=0;x<220;x++){const c=hash(Math.floor(x/5)+(Math.floor(y/4)%2)*2,Math.floor(y/4),9);const lit=1-Math.hypot(x-110,y-96)/70;p.set(x,y,pick(['#14121c','#26222e','#3c3640','#5a504c'],.25+c*.35+Math.max(0,lit)*.5,x,y));}
+  // hooded figure by the lamp
+  p.poly([[168,110],[170,92],[174,86],[178,92],[180,110]],'#0a0810');p.circle(174,85,3.2,'#0a0810');p.rect(176,86,3,1,'#ff9040');
+  // puddles
+  p.rect(70,102,34,2,'#8a6a40');p.rect(78,105,22,1,'#a88650');
+};
+
+S.forest=(p)=>{
+  p.grad(0,110,[[0,'#08180e'],[.5,'#1a3a24'],[1,'#2a5030']],9);
+  const layer=(n,seed,wmin,wmax,ramp,yb)=>{for(let i=0;i<n;i++){const x=hash(i,seed,1)*230-5,w=wmin+hash(i,seed,2)*(wmax-wmin);
+      for(let y=0;y<yb;y++){const wob=Math.sin(y*.08+i)*1.2;for(let k=0;k<w;k++){const xx=x+k+wob,v=.3+(k/w)*-.3+.3+(hash(Math.floor(xx),y,4)-.5)*.4+(vn(xx*.4,y*.3,seed)>.6?.15:-.05);p.set(xx,y,pick(ramp,v,xx,y));}}}};
+  layer(10,1,4,7,['#0c2014','#163020','#244a2e'],86);
+  p.fog(20,90,'#6a9a70',.55,2,.05);
+  layer(7,2,8,12,['#0a180e','#14281a','#20402a'],96);
+  // light shafts
+  for(let i=0;i<4;i++){const x0=100+i*26;for(let y=0;y<96;y++){const xs=x0+y*.45;for(let k=0;k<9;k++){const a=(1-y/96)*.5*(.6+.4*Math.sin(k/9*3.14));if(a*5>bay(xs+k,y)*3)p.mixpx(xs+k,y,'#ffe8a0',.22);}}}
+  // canopy
+  for(let i=0;i<22;i++)p.blob(i*11,2+hash(i,3,3)*10,12,9,['#06100a','#0e2014','#173a20'],{seed:i,noise:.4,rough:.3});
+  // ground
+  p.ridge({base:86,amp:6,scale:.03,seed:7,ramp:['#10261a','#1c3c24','#2e5a34','#4a7a40'],v0:.55,vfall:.45,tex:.4});
+  p.poly([[96,86],[124,86],[170,110],[40,110]],(x,y)=>pick(['#2a1a10','#4a3220','#7a5a38'],.35+((y-86)/24)*.3+(hash(x,y,3)-.5)*.5,x,y));
+  // foreground big root/trunks
+  p.thick(14,110,14,58,9,(x,y)=>pick(['#120a06','#2a1a10','#4a3220'],.3+(hash(x,y,2)-.5)*.5+(vn(x*.5,y*.2,3)>.55?.2:0),x,y));
+  p.thick(208,110,208,56,11,(x,y)=>pick(['#120a06','#2a1a10','#4a3220'],.3+(hash(x,y,2)-.5)*.5+(vn(x*.5,y*.2,3)>.55?.2:0),x,y));
+  p.blob(14,100,14,6,['#10261a','#2e5a34','#4a7a40'],{seed:3,noise:.5,rough:.3});p.blob(208,98,14,7,['#10261a','#2e5a34','#4a7a40'],{seed:4,noise:.5,rough:.3});
+  for(let i=0;i<50;i++){const x=hash(i,5,6)*220,y=88+hash(i,6,6)*22;p.line(x,y,x+(hash(i,7,6)-.5)*4,y-3-hash(i,8,6)*5,pick(['#1c3c24','#2e5a34','#5a8a44'],hash(i,9,6),x,y));}
+  p.speckle(0,20,220,100,40,9,['#e8f0a0','#a0e0a0','#ffffff']);
+};
+
+S.trolls=(p)=>{
+  p.grad(0,70,[[0,'#2c3068'],[.35,'#8a5a98'],[.65,'#e88a6a'],[1,'#ffd890']],11);
+  p.clouds(10,44,['#7a4a80','#d27a7a','#ffc890'],17,.52,.05);
+  p.glow(150,66,50,'#ffd890',.9);p.blob(150,68,8,8,['#fff0b0','#ffffff'],{noise:0,mask:(x,y)=>y<70});
+  for(let i=0;i<7;i++){const a=-1.15+i*.28;for(let r=12;r<110;r++){const x=150+Math.cos(a)*r,y=68+Math.sin(a)*r;if(hash(r,i,3)<.55)p.mixpx(x,y,'#ffe0a0',.2);}}
+  p.ridge({base:64,amp:24,scale:.014,seed:41,sharp:1.4,ramp:['#3a3a6a','#5a4a80','#8a6a98'],v0:.55,vfall:.2,tex:.2,snowLine:34});
+  p.fog(54,74,'#e8a890',.6,6,.05);
+  for(let i=0;i<46;i++){const x=hash(i,1,7)*230-5,h=14+hash(i,2,7)*14;p.pine(x,76+hash(i,3,7)*6,h,h*.55,['#0e1e22','#1a3430','#2c5440'],i);}
+  p.ridge({base:84,amp:8,scale:.03,seed:15,ramp:['#1c2a1e','#34503a','#587a48','#90a864'],v0:.6,vfall:.4});
+  const stone=['#262a34','#444c5a','#6e7886','#a8a09a','#e8b890'];
+  const troll=(x,by,s,flip)=>{const f=flip?-1:1;
+    p.blob(x-5*s*f,by-5*s,5*s,7*s,stone,{seed:3,noise:.5,lx:.7,rough:.2});p.blob(x+6*s*f,by-5*s,5*s,7*s,stone,{seed:4,noise:.5,lx:.7,rough:.2});
+    p.blob(x,by-24*s,12*s,17*s,stone,{seed:5,noise:.55,lx:.7,ly:-.6,rough:.15});
+    p.blob(x-11*s*f,by-26*s,4*s,10*s,stone,{seed:6,noise:.5,lx:.7});p.blob(x+11*s*f,by-23*s,4*s,10*s,stone,{seed:7,noise:.5,lx:.7});
+    p.blob(x+2*s*f,by-43*s,7*s,6.5*s,stone,{seed:8,noise:.5,lx:.7,ly:-.5});
+    p.rect(x-1*s,by-45*s,6*s,1.5*s,'#1a1e26');p.rect(x+1*s,by-40*s,5*s,1.2*s,'#1a1e26');
+    p.blob(x-2*s*f,by-30*s,6*s,3*s,['#2c4a24','#4a7a30','#7aa840'],{seed:9,noise:.5,rough:.3});};
+  troll(62,92,1.0,false);troll(108,96,1.25,true);troll(158,92,.95,false);
+  // fire pit and cauldron
+  p.blob(130,102,16,5,['#1a1210','#3a2a22','#5a4a3a'],{seed:6,noise:.5});p.blob(130,96,7,5,['#10100e','#2a2a2e','#4a4a52'],{seed:2});p.rect(123,92,14,2,'#10100e');
+  p.speckle(120,100,142,104,18,8,['#6a5a50','#2a2220']);
+  p.rect(30,100,3,1,'#d8d0b0');p.rect(34,101,5,1,'#d8d0b0');p.rect(180,102,6,1,'#d8d0b0');
+  for(let i=0;i<5;i++)p.blob(10+i*45,108,12,5,['#14200f','#2c4a24','#587a40'],{seed:i,noise:.5,rough:.3});
+};
+
+S.mountains=(p)=>{
+  p.grad(0,70,[[0,'#6a7ea6'],[.5,'#a8b8d0'],[1,'#e0e6ee']],9);
+  p.clouds(4,34,['#9aaac4','#cdd8e6','#f6f8fb'],23,.5,.045);
+  p.ridge({base:58,amp:34,scale:.02,seed:51,sharp:1.1,ramp:['#6a7a9a','#8c9ab4','#b8c4d8'],v0:.5,vfall:.1,tex:.15,lit:6,snowLine:40});
+  p.fog(36,62,'#d8e0ec',.7,3,.05);
+  p.ridge({base:76,amp:40,scale:.018,seed:57,sharp:1.2,ramp:['#2c3040','#4a4e62','#747a8c','#a0a6b4'],v0:.55,vfall:.3,tex:.35,snowLine:52});
+  p.fog(58,80,'#c4ccdc',.6,8,.05);
+  p.ridge({base:88,amp:22,scale:.03,seed:63,sharp:1.1,ramp:['#14161e','#2a2c38','#44485a','#6a6e80'],v0:.55,vfall:.35,tex:.4,snowLine:66});
+  for(let i=0;i<18;i++){const x=hash(i,1,9)*100-5;p.pine(x,100+hash(i,2,9)*8,16+hash(i,3,9)*10,9,['#0a1a16','#16302a','#26483a'],i);}
+  p.ridge({base:101,amp:6,scale:.04,seed:70,ramp:['#1a1c22','#32343e','#585a66'],v0:.55,vfall:.3});
+  // zig-zag trail
+  const pts=[[150,108],[120,102],[160,96],[128,90],[158,85],[138,80],[152,76]];
+  for(let i=0;i<pts.length-1;i++)p.thick(pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1],2,(x,y)=>pick(['#5a4a38','#8a7458','#b8a07c'],.5+(hash(x,y,2)-.5)*.5,x,y));
+  // wanderer
+  p.poly([[133,92],[134,86],[137,84],[139,86],[140,92]],'#1a2a22');p.circle(136,83,2,'#d8a880');p.line(141,92,141,81,'#4a3020');
+  for(let i=0;i<70;i++)p.mixpx(hash(i,1,3)*220,hash(i,2,3)*100,'#ffffff',.7);
+};
+
+S.caves=(p)=>{
+  p.grad(0,110,[[0,'#2a2430'],[1,'#4a4254']],6);
+  const rock=['#1c1822','#34303e','#58526a','#8a8298'];
+  // back wall with columns
+  p.rectR(0,0,220,110,rock,{seed:5,tex:.7,k:.1,v0:.3});
+  p.fog(30,100,'#6a6280',.5,4,.04);
+  // chasm
+  p.poly([[60,70],[160,70],[190,110],[30,110]],'#050408');p.glow(110,106,60,'#ff5a20',.35);
+  // far bridge
+  p.rect(70,72,80,2,'#6a4a2c');for(let x=72;x<148;x+=4)p.rect(x,72,2,3,'#3a2616');p.line(70,66,150,66,'#4a3420');for(let x=72;x<150;x+=8)p.line(x,66,x,72,'#4a3420');
+  // near bridge
+  p.poly([[0,88],[220,92],[220,98],[0,94]],(x,y)=>pick(['#2a1a10','#5a3a22','#8a6038'],.3+(Math.floor(x/6)%2)*.25+(hash(x,y,3)-.5)*.4,x,y));
+  for(let x=0;x<220;x+=10){p.line(x,76+x*.02,x,90+x*.02,'#3a2616');p.line(x+1,76+x*.02,x+1,90+x*.02,'#5a3a22');}
+  p.line(0,76,220,78,'#4a3420');p.line(0,77,220,79,'#6a4a2c');
+  // ceiling and stalactites
+  p.blob(110,-10,140,30,rock,{seed:8,noise:.6,rough:.2});
+  for(let i=0;i<18;i++){const x=i*13+hash(i,1,2)*8,l=10+hash(i,2,2)*24,w=4+hash(i,3,2)*5;p.poly([[x-w,0],[x+w,0],[x,l]],(a,b)=>pick(rock,.35+(1-b/l)*.2-(a-x)/w*.25+(hash(a,b,2)-.5)*.3,a,b));}
+  // side walls
+  p.blob(-6,60,40,70,rock,{seed:9,noise:.6,rough:.25,lx:.8,ly:-.2});p.blob(226,64,40,70,rock,{seed:10,noise:.6,rough:.25,lx:-.8,ly:-.2});
+  p.blob(8,100,36,16,rock,{seed:2,noise:.6,rough:.3});p.blob(212,102,36,16,rock,{seed:3,noise:.6,rough:.3});
+  // torch bracket
+  p.rect(26,52,3,14,'#2a1a10');p.poly([[22,44],[26,34],[30,44],[28,50],[24,50]],'#ff8a20');p.poly([[24,44],[26,38],[28,44],[26,48]],'#ffe070');
+  p.light([{x:26,y:42,r:130,c:'#ffa040',i:1.9},{x:110,y:105,r:80,c:'#ff4a10',i:.6,sy:.7}],.3,[1,.97,1.05]);
+  // eyes in the dark (unlit)
+  [[150,50],[168,60],[188,46],[132,40]].forEach((e,i)=>{p.rect(e[0],e[1],2,1,'#ff2a10');p.rect(e[0]+5,e[1],2,1,'#ff2a10');p.glow(e[0]+3,e[1],5,'#ff3010',.5);});
+  p.poly([[26,44],[24,36],[28,34]],'#ffd060');
+};
+M.caves={indoor:true};
+
+S.last=(p)=>{
+  p.grad(0,66,[[0,'#8ab8e0'],[.5,'#e8e0b8'],[1,'#fcd88a']],9);
+  p.clouds(6,30,['#e6d6c0','#fff1d8','#ffffff'],31,.55,.045);
+  p.ridge({base:64,amp:30,scale:.013,seed:81,sharp:1.0,ramp:['#6a7a88','#8ea09c','#b8c4a8'],v0:.55,vfall:.2,tex:.25});
+  // two waterfalls
+  [[84,28,30],[132,24,34]].forEach(w=>{for(let y=w[1];y<w[1]+w[2]+8;y++)for(let k=0;k<3;k++){if(hash(w[0]+k,y,6)>.25)p.set(w[0]+k,y,pick(['#c8e0f0','#ffffff'],hash(k,y,3),k,y));}p.glow(w[0]+1,w[1]+w[2]+8,14,'#ffffff',.6);});
+  p.fog(48,70,'#fff0d0',.7,5,.05);
+  // glimpse of Rivendell
+  [[108,56,3,8],[113,52,2,12],[117,57,3,7],[104,58,2,6]].forEach(s=>{p.rect(s[0],s[1],s[2],s[3],'#e8dcc0');p.poly([[s[0]-1,s[1]],[s[0]+s[2]/2,s[1]-5],[s[0]+s[2]+1,s[1]]],'#c8b890');p.set(s[0]+1,s[1]+3,'#ffd060');});
+  p.glow(110,58,20,'#ffe090',.4);
+  // autumn trees
+  const aut=['#7a2a10','#c05a18','#e89a30','#f6d060'];
+  for(let i=0;i<14;i++){const x=hash(i,1,5)*220,y=66+hash(i,2,5)*8,r=6+hash(i,3,5)*6;p.oak(x,y,r,i%3?aut:['#2f5a28','#4f8a3a','#8cb85a'],i,r*.7);}
+  p.ridge({base:78,amp:8,scale:.03,seed:85,ramp:['#3a5a2a','#6a8a3a','#a8b84a','#d8d070'],v0:.6,vfall:.4,tex:.4});
+  p.poly([[104,76],[116,76],[150,110],[70,110]],(x,y)=>pick(['#6a5a3a','#a89060','#d8c088'],.4+((y-76)/34)*.3+(hash(x,y,3)-.5)*.5,x,y));
+  // birches
+  [[18,110,82],[34,110,70],[196,110,86],[210,110,66]].forEach((b,i)=>{p.thick(b[0],b[1],b[0]+(i%2?1:-1),b[2],3,(x,y)=>(hash(x,y,3)<.12?'#2a2a26':pick(['#b0aca0','#e8e4d8','#ffffff'],.5+(hash(x,y,4)-.5)*.6,x,y)));
+    p.blob(b[0],b[2]-4,16,10,['#8a4a10','#d08a28','#f6d060'],{seed:i+4,noise:.5,rough:.35,scale:.8});});
+  for(let i=0;i<60;i++){const x=hash(i,1,8)*220,y=70+hash(i,2,8)*40;p.set(x,y,pick(['#e8a030','#c05a18','#f6d060'],hash(i,3,8),x,y));}
+  p.speckle(60,40,170,80,30,3,['#fff8c0','#ffffff']);
+};
+
+S.rivendell=(p)=>{
+  p.grad(0,70,[[0,'#7aa0d0'],[.45,'#f0d8b8'],[1,'#fcd890']],9);
+  p.clouds(4,26,['#e8c8b0','#fff0e0','#ffffff'],37,.58,.04);
+  const aut=['#7a2a10','#c05a18','#e89a30','#f6d060'];
+  const cliff=['#3a3a40','#5e5e64','#8a8680','#b8b0a0'];
+  p.blob(-10,60,56,80,cliff,{seed:11,noise:.7,rough:.3,lx:.8,ly:-.4});p.blob(232,56,60,84,cliff,{seed:12,noise:.7,rough:.3,lx:-.8,ly:-.4});
+  // misty ravine behind
+  p.grad(60,110,[[0,'#c8c0b0'],[.4,'#6a8a80'],[1,'#1c3a40']],7,30,190);p.fog(60,96,'#fff0d8',.8,3,.04);
+  p.ridge({base:74,amp:10,scale:.03,seed:4,ramp:['#2a4a3a','#4a7a58','#8aa870'],v0:.5,vfall:.3,bottom:92});
+  // waterfall
+  for(let y=18;y<78;y++)for(let k=0;k<6;k++){if(hash(96+k,y,6)>.2)p.set(96+k,y,pick(['#9ac0e0','#dff0ff','#ffffff'],hash(k,y,3)+.1,k,y));}
+  p.glow(99,78,20,'#ffffff',.7);
+  for(let i=0;i<20;i++)p.oak(hash(i,1,4)*60+6,62-hash(i,2,4)*40,5+hash(i,3,4)*4,aut,i,3);
+  for(let i=0;i<20;i++)p.oak(hash(i,4,4)*50+166,58-hash(i,5,4)*36,5+hash(i,6,4)*4,aut,i+30,3);
+  // main pavilion
+  const stone=['#8a8070','#b8ae98','#e0d8c0','#f6f0dc'];
+  p.rectR(54,72,112,6,stone,{seed:3,tex:.15});
+  p.rectR(66,50,88,22,stone,{seed:4,tex:.15,k:.3});
+  for(let x=70;x<152;x+=10){p.poly([[x,72],[x,60],[x+4,52],[x+8,60],[x+8,72]],'#3a2a30');p.poly([[x+1,72],[x+1,61],[x+4,55],[x+7,61],[x+7,72]],'#ffd070');p.glow(x+4,64,9,'#ffb850',.35);}
+  for(let x=66;x<=154;x+=11){p.rect(x,50,2,22,'#fff8e8');p.rect(x+1,50,1,22,'#c8bea0');}
+  p.poly([[60,50],[110,30],[160,50],[154,52],[110,37],[66,52]],(x,y)=>pick(['#1a4a3a','#2f7a58','#6ab08a'],.5+(hash(x,y,3)-.5)*.4+(y%3===0?.1:0),x,y));
+  p.rect(108,20,3,12,'#e0d8c0');p.poly([[106,22],[110,10],[114,22]],'#2f7a58');
+  // arched bridge
+  for(let x=0;x<=60;x++){const y=88-Math.sin(x/60*Math.PI)*12;p.rect(x,y,1,3,'#d8d0b8');p.set(x,y-4,'#fff8e8');if(x%6===0)p.line(x,y,x,y-4,'#c8bea0');}
+  for(let x=0;x<=40;x++){const y=88-Math.sin(x/40*Math.PI)*8;p.rect(180+x,y,1,3,'#d8d0b8');p.set(180+x,y-4,'#fff8e8');}
+  p.rectR(0,88,22,22,stone,{seed:7});p.rectR(198,88,22,22,stone,{seed:8});
+  // river
+  p.grad(92,110,[[0,'#4a78a8'],[1,'#1c3a58']],5,22,198);
+  for(let y=94;y<110;y+=2)for(let x=22;x<198;x++){if(Math.sin(x*.4+y*1.9+vn(x*.1,y,2)*5)>.88)p.set(x,y,'#c8e0f0');}
+  for(let i=0;i<5;i++)p.rect(60+i*24,92,2,16,'#fff0c8');
+  for(let i=0;i<80;i++){const x=hash(i,1,2)*220,y=hash(i,2,2)*100;p.set(x,y,pick(['#e89a30','#c05a18','#f6d060'],hash(i,3,2),x,y));}
+};
+
+S.title=(p)=>{
+  p.grad(0,75,[[0,'#050a1c'],[.5,'#1a1c48'],[.8,'#5a2a50'],[1,'#d04a30']],12);
+  p.stars(110,5,48);
+  p.blob(40,22,8,8,['#c8d0e0','#fff8e0'],{noise:0});p.blob(43,20,7,7,['#0a1030'],{noise:0});p.glow(40,22,24,'#a0b8ff',.25);
+  p.clouds(20,56,['#2a1840','#5a2850','#c0482e'],42,.55,.045,80,220);
+  // Mount Doom far right
+  p.glow(176,62,64,'#ff5a20',.8);
+  p.poly([[130,78],[160,52],[170,40],[178,40],[190,52],[220,78]],(x,y)=>pick(['#0a0608','#2a1214','#6a2a1c'],.3+(vn(x*.2,y*.3,3)-.5)*.5+(x<170?.15:-.1),x,y));
+  p.poly([[168,42],[172,36],[176,42]],'#ffb040');p.glow(172,40,14,'#ff8a30',.9);
+  for(let i=0;i<6;i++)p.blob(172+vn(i,1,1)*6,34-i*6,3+i*1.2,2.5+i,['#2a1418','#5a2a28','#8a3a2a'],{seed:i,noise:.4,rough:.3});
+  p.ridge({base:76,amp:16,scale:.016,seed:91,sharp:1.1,ramp:['#08060c','#14101c','#2a2034'],v0:.5,vfall:.2,tex:.2});
+  p.fog(66,84,'#7a3a50',.5,3,.05);
+  // foreground hill with the hobbit
+  p.blob(40,112,100,40,['#06100a','#0e2014','#1c3a24','#34603a'],{seed:6,noise:.3,lx:.6,ly:-.7});
+  p.poly([[90,90],[96,90],[150,110],[96,110]],(x,y)=>pick(['#1a1210','#3a2a22','#6a5040'],.35+(hash(x,y,3)-.5)*.5,x,y));
+  p.thick(96,90,128,82,2,'#3a2a22');p.thick(128,82,112,76,1.4,'#3a2a22');
+  const hx=60,hy=72;
+  p.poly([[hx-4,hy+12],[hx-3,hy+3],[hx,hy],[hx+3,hy+3],[hx+4,hy+12]],'#050806');p.circle(hx,hy-3,3.4,'#050806');p.poly([[hx-6,hy-3],[hx,hy-9],[hx+6,hy-3]],'#050806');
+  p.rect(hx+6,hy-12,1,24,'#2a1a10');p.rect(hx+5,hy-12,3,1,'#2a1a10');p.poly([[hx-6,hy+2],[hx-9,hy+8],[hx-5,hy+9]],'#050806');
+  p.rect(hx+1,hy-3,1,1,'#ffb040');p.glow(hx+6,hy-12,6,'#ffb040',.3);
+};
+M.title={indoor:true};
+})();
+
+/* ===== Scenes part 2: south, Isengard -> Mordor ===== */
+(function(){
+const S=PixelArt.SCENES,M=PixelArt.meta,U=PixelArt.util;
+const {vn,fbm,hash,pick,mulberry,bay}=U;
+
+S.rivendell_leave=S.rivendell;
+
+S.south_road=(p)=>{
+  p.grad(0,66,[[0,'#5a5a5e'],[.5,'#8e8a7c'],[1,'#c4b48a']],9);
+  p.clouds(4,40,['#6a6a6c','#9a9890','#c8c2ae'],61,.45,.04);
+  // smoke plume on horizon
+  for(let i=0;i<9;i++)p.blob(150+vn(i,3,2)*8,60-i*6,8+i*2.2,6+i*1.2,['#14120e','#2a2620','#4a443a'],{seed:i,noise:.5,rough:.3});
+  p.ridge({base:66,amp:12,scale:.014,seed:71,ramp:['#4a5048','#6a705a','#8a8a68'],v0:.55,vfall:.2});
+  p.fog(54,74,'#c4b48a',.6,2,.05);
+  p.ridge({base:80,amp:14,scale:.02,seed:75,ramp:['#2c2e22','#4a4a30','#76704a','#a09462'],v0:.55,vfall:.4,tex:.4});
+  p.ridge({base:94,amp:10,scale:.03,seed:79,ramp:['#201e18','#3a3624','#5e5638','#8a7e50'],v0:.55,vfall:.4,tex:.45});
+  // road
+  p.poly([[100,80],[106,80],[170,110],[60,110]],(x,y)=>{const t=(y-80)/30;return pick(['#2a2218','#5a4a34','#8a7650','#b8a070'],.3+t*.3+(hash(x,y,3)-.5)*.5,x,y);});
+  p.line(103,82,86,110,'#2a2218');p.line(104,82,126,110,'#2a2218');
+  // standing stones
+  [[38,92,5,16],[48,94,4,12],[176,90,6,18]].forEach((s,i)=>{p.poly([[s[0],s[1]],[s[0]+1,s[1]-s[3]],[s[0]+s[2]-1,s[1]-s[3]+2],[s[0]+s[2],s[1]]],(x,y)=>pick(['#1e2024','#3a3e44','#6a7078'],.4+(x-s[0])/s[2]*-.4+.3+(hash(x,y,3)-.5)*.4,x,y));});
+  // dead tree
+  p.thick(14,104,16,66,3,'#120e0a');p.thick(16,80,4,66,1.6,'#120e0a');p.thick(16,76,30,62,1.6,'#120e0a');p.thick(15,90,3,82,1.4,'#120e0a');p.thick(30,62,34,56,1,'#120e0a');p.thick(4,66,1,60,1,'#120e0a');
+  [[120,20],[134,28],[100,16],[190,30]].forEach(b=>{p.line(b[0],b[1],b[0]+2,b[1]+1,'#14120e');p.line(b[0]+2,b[1]+1,b[0]+4,b[1],'#14120e');});
+  for(let i=0;i<120;i++){const x=hash(i,1,4)*220,y=96+hash(i,2,4)*14;p.line(x,y,x+1.5,y-3-hash(i,3,4)*3,pick(['#3a3624','#8a7e50','#b8a070'],hash(i,4,4),x,y));}
+};
+
+S.isengard=(p)=>{
+  p.grad(0,70,[[0,'#0c0a0e'],[.5,'#2a1414'],[.85,'#7a2c14'],[1,'#c0581c']],10);
+  p.clouds(4,46,['#140c0e','#2a1818','#5a2a1a'],81,.46,.045);
+  p.ridge({base:66,amp:20,scale:.014,seed:83,sharp:1.1,ramp:['#14101a','#241a26','#3e2a34'],v0:.5,vfall:.2,tex:.2});
+  p.fog(54,74,'#a04a20',.6,3,.05);
+  // ring wall
+  p.poly([[0,74],[40,64],[110,60],[180,64],[220,74],[220,88],[0,88]],(x,y)=>pick(['#0e0c10','#241e24','#4a3c3a'],.35+(hash(x,y,3)-.5)*.4+((y-64)<3?.3:0)+(x%14<2?.1:0),x,y));
+  for(let x=0;x<220;x+=7){const y=60+Math.abs(x-110)*.12;p.rect(x,y,4,3,'#241e24');}
+  // fire pits
+  [[30,82],[70,80],[150,80],[190,82]].forEach(f=>{p.glow(f[0],f[1],18,'#ff7020',.8);p.poly([[f[0]-3,f[1]+2],[f[0],f[1]-6],[f[0]+3,f[1]+2]],'#ff8a20');p.poly([[f[0]-1,f[1]+2],[f[0],f[1]-3],[f[0]+1,f[1]+2]],'#ffe070');});
+  // Orthanc
+  const tow=(x,y)=>pick(['#030204','#0c0a10','#1a1620','#3a2a30'],.3+((x-110)/-14)*.2+(hash(x,y,3)-.5)*.3,x,y);
+  p.poly([[96,76],[100,40],[104,18],[108,6],[111,4],[114,6],[118,18],[122,40],[126,76]],tow);
+  p.poly([[100,28],[96,22],[102,20]],'#0c0a10');p.poly([[120,28],[126,20],[118,20]],'#0c0a10');p.poly([[104,12],[100,2],[108,8]],'#0c0a10');p.poly([[118,12],[122,2],[114,8]],'#0c0a10');
+  for(let y=26;y<76;y+=8)p.line(100+((y-40)>0?(y-40)*.1:0),y,122-((y-40)>0?(y-40)*.1:0),y,'#050408');
+  p.rect(110,24,2,3,'#ff9a30');p.glow(111,25,10,'#ff7020',.7);
+  p.glow(111,76,40,'#ff6a20',.5);
+  // smoke from inside the ring
+  for(let i=0;i<8;i++){p.blob(40+vn(i,1,1)*6,60-i*7,5+i*1.5,4+i,['#0a080a','#1c1418','#3a2a28'],{seed:i,noise:.4,rough:.3});p.blob(176+vn(i,2,1)*6,60-i*7,5+i*1.5,4+i,['#0a080a','#1c1418','#3a2a28'],{seed:i+8,noise:.4,rough:.3});}
+  // muddy ground with stumps
+  p.ridge({base:90,amp:6,scale:.03,seed:87,ramp:['#14100e','#2a1e18','#4a362a','#7a5a3a'],v0:.5,vfall:.35,tex:.5});
+  p.glow(110,100,90,'#c0481c',.25);
+  [[20,102,8],[64,106,10],[150,104,9],[196,106,11],[110,108,7]].forEach((s,i)=>{p.blob(s[0],s[1],s[2],s[2]*.45,['#1a1008','#3a2616','#6a4a2c','#a07a44'],{seed:i,noise:.5,rough:.25});p.blob(s[0],s[1]-s[2]*.15,s[2]*.8,s[2]*.28,['#8a6a3a','#c8a060','#e8c88a'],{seed:i+4,noise:.3});});
+  // uruk-hai silhouettes with torches
+  [[84,90],[134,92]].forEach(u=>{p.poly([[u[0]-3,u[1]+10],[u[0]-2,u[1]+2],[u[0]+2,u[1]+2],[u[0]+3,u[1]+10]],'#030204');p.circle(u[0],u[1],2.5,'#030204');p.line(u[0]+3,u[1]+4,u[0]+6,u[1]-3,'#030204');p.rect(u[0]+5,u[1]-6,2,3,'#ffb040');p.glow(u[0]+6,u[1]-5,8,'#ff8a30',.6);});
+  for(let i=0;i<40;i++){const x=hash(i,1,6)*220,y=hash(i,2,6)*90;p.set(x,y,pick(['#ff8a30','#ffc060','#c0481c'],hash(i,3,6),x,y));}
+};
+
+S.fangorn=(p)=>{
+  p.grad(0,110,[[0,'#08201e'],[.5,'#1c4a40'],[1,'#2e6a50']],9);
+  const bark=['#0c1612','#1c2c20','#34503a','#587a50'];
+  const trunk=(x,w,yb,seed,ramp)=>{for(let y=0;y<yb;y++){const wob=Math.sin(y*.07+seed)*1.5;for(let k=0;k<w;k++){const xx=x+k+wob,v=.65-(k/w)*.5+(vn(xx*.5,y*.12,seed)-.5)*.5+((Math.floor(xx)%5===0)?-.15:0);p.set(xx,y,pick(ramp,v,xx,y));}}};
+  for(let i=0;i<9;i++)trunk(i*26-6+hash(i,1,2)*10,8+hash(i,2,2)*6,84,i,['#0a1a18','#14302c','#285048']);
+  p.fog(10,96,'#7ab8a0',.7,3,.045);
+  // the Ent
+  const ex=118;
+  p.thick(ex-8,92,ex-7,56,10,(x,y)=>pick(bark,.5+(vn(x*.4,y*.15,3)-.5)*.7,x,y));p.thick(ex+8,92,ex+9,56,10,(x,y)=>pick(bark,.4+(vn(x*.4,y*.15,4)-.5)*.7,x,y));
+  p.blob(ex,52,20,24,bark,{seed:5,noise:.6,rough:.15});
+  p.thick(ex-18,46,ex-32,30,6,(x,y)=>pick(bark,.5+(vn(x*.4,y*.2,5)-.5)*.7,x,y));p.thick(ex+18,46,ex+32,34,6,(x,y)=>pick(bark,.4+(vn(x*.4,y*.2,6)-.5)*.7,x,y));
+  [[ex-32,30],[ex+32,34]].forEach((h,i)=>{for(let k=0;k<4;k++)p.thick(h[0],h[1],h[0]+(k-1.5)*3,h[1]-9,1.5,'#34503a');});
+  p.blob(ex,26,11,10,bark,{seed:6,noise:.5,rough:.15});
+  p.rect(ex-8,22,16,2,'#0c1612');p.rect(ex-6,25,4,3,'#e8b838');p.rect(ex+2,25,4,3,'#e8b838');p.glow(ex-4,26,9,'#e8b838',.6);p.glow(ex+4,26,9,'#e8b838',.6);p.set(ex-5,26,'#fff4a0');p.set(ex+3,26,'#fff4a0');
+  p.blob(ex,38,8,7,['#3a5a28','#5a8a38','#8ab850'],{seed:7,noise:.5,rough:.35});
+  for(let i=0;i<8;i++)p.blob(ex-14+i*4,14-vn(i,1,1)*4,8,5,['#102a20','#1c4a34','#2e7a4a'],{seed:i,noise:.5,rough:.35});
+  // light shafts + canopy
+  for(let i=0;i<3;i++){const x0=36+i*70;for(let y=0;y<96;y++){const xs=x0+y*.3;for(let k=0;k<10;k++){const a=(1-y/96);if(a*5>bay(xs+k,y)*3.2)p.mixpx(xs+k,y,'#e8f0a0',.18);}}}
+  for(let i=0;i<22;i++)p.blob(i*11,1+hash(i,3,3)*8,12,8,['#040e0c','#0c2420','#14403a'],{seed:i,noise:.4,rough:.3});
+  // forest floor, roots, mushrooms
+  p.ridge({base:90,amp:6,scale:.03,seed:7,ramp:['#08140e','#14301e','#2a5a34','#4a8a48'],v0:.55,vfall:.4,tex:.5});
+  p.thick(0,106,40,92,6,(x,y)=>pick(bark,.35+(hash(x,y,2)-.5)*.5,x,y));p.thick(220,104,184,92,6,(x,y)=>pick(bark,.35+(hash(x,y,2)-.5)*.5,x,y));
+  [[60,104],[72,106],[160,102]].forEach((m,i)=>{p.rect(m[0],m[1],2,3,'#d8e8d0');p.blob(m[0]+1,m[1],4,2.4,['#10605a','#30c0a8','#a0f0d8'],{seed:i,noise:.2});p.glow(m[0]+1,m[1],8,'#40ffd0',.4);});
+  p.speckle(0,30,220,100,60,4,['#c8ffb0','#ffffff','#80ffd0']);
+};
+
+S.rohan=(p)=>{
+  p.grad(0,70,[[0,'#4a82d0'],[.5,'#a8c8ea'],[.85,'#f6e0b0'],[1,'#fbc888']],10);
+  p.clouds(4,44,['#c89a8a','#fbe6d0','#ffffff'],91,.5,.04);
+  p.ridge({base:58,amp:26,scale:.012,seed:93,sharp:1.1,ramp:['#5a6c9a','#8a9cc0','#b8c8e0'],v0:.55,vfall:.15,tex:.2,snowLine:44});
+  p.fog(48,68,'#f6e0b8',.6,3,.05);
+  p.ridge({base:76,amp:10,scale:.014,seed:96,ramp:['#6a7a30','#98a640','#c8c060'],v0:.6,vfall:.3});
+  // Edoras hill + Meduseld
+  p.blob(150,80,44,26,['#4a5a22','#788a34','#aab444','#d4cc68'],{seed:9,noise:.3,lx:-.6,ly:-.7});
+  p.poly([[132,70],[168,70],[172,76],[128,76]],'#5a3a22');for(let x=130;x<170;x+=3)p.line(x,66,x,76,'#3a2616');
+  p.rectR(138,56,28,14,['#3a2210','#6a4a28','#9a7240'],{seed:3,tex:.3});
+  p.poly([[134,58],[152,42],[170,58],[166,58],[152,47],[138,58]],(x,y)=>pick(['#8a6a20','#d8a838','#f6d870'],.5+(hash(x,y,3)-.5)*.5+(y%3===0?.1:0),x,y));
+  p.poly([[134,58],[152,42],[170,58]],(x,y)=>pick(['#8a6a20','#d8a838','#f6d870'],.5+(hash(x,y,3)-.5)*.5+(y%3===0?-.1:.2),x,y));
+  p.line(152,42,150,38,'#f6d870');p.line(152,42,154,38,'#f6d870');
+  p.rect(150,62,5,8,'#1a0e06');p.glow(152,66,8,'#ffb040',.3);
+  // banners
+  [[130,60],[172,60]].forEach((b,i)=>{p.rect(b[0],b[1]-8,1,12,'#3a2616');p.poly([[b[0]+1,b[1]-8],[b[0]+8,b[1]-6+(i?1:0)],[b[0]+1,b[1]-3]],'#2f8a3a');p.set(b[0]+4,b[1]-6,'#ffffff');});
+  // spiral path
+  p.thick(110,92,136,84,1.4,'#c8b06a');p.thick(136,84,160,86,1.4,'#c8b06a');p.thick(160,86,148,76,1.4,'#c8b06a');
+  // golden grass plain
+  p.ridge({base:90,amp:8,scale:.022,seed:99,ramp:['#6a6a20','#a8a038','#d8c458','#f6e488'],v0:.6,vfall:.4,tex:.4});
+  for(let i=0;i<200;i++){const x=hash(i,1,4)*220,y=90+hash(i,2,4)*20;const l=3+(y-90)*.3;p.line(x,y,x+2+(y-90)*.05,y-l,pick(['#8a8228','#d8c458','#f6e488','#ffffff'],hash(i,4,4),x,y));}
+  // riders
+  const rider=(x,y,s)=>{p.blob(x,y,5*s,2.4*s,['#0c0806'],{noise:0});p.rect(x+3*s,y-3*s,3*s,2*s,'#0c0806');p.poly([[x+4*s,y-3*s],[x+7*s,y-4*s],[x+5*s,y-1*s]],'#0c0806');
+    for(let k=0;k<3;k++)p.line(x-3*s+k*3*s,y+1*s,x-4*s+k*3*s,y+4*s,'#0c0806');p.rect(x-1*s,y-7*s,2*s,5*s,'#0c0806');p.circle(x,y-8*s,1.6*s,'#0c0806');p.line(x-1,y-5*s,x-9*s,y-14*s,'#0c0806');p.rect(x-9*s,y-14*s,5*s,2*s,'#2f8a3a');};
+  rider(40,104,1.6);rider(82,100,1.2);rider(190,102,1.4);
+};
+
+S.pelennor=(p)=>{
+  p.grad(0,68,[[0,'#1a1028'],[.4,'#5a2438'],[.75,'#c0502a'],[1,'#f0a048']],11);
+  p.clouds(2,46,['#1a0e18','#4a2028','#a04a30'],101,.44,.045);
+  p.ridge({base:62,amp:30,scale:.012,seed:103,sharp:1.1,ramp:['#14101c','#241a2c','#3e2a40'],v0:.5,vfall:.2,tex:.2,snowLine:44});
+  // Minas Tirith distant
+  for(let i=0;i<6;i++){const hw=26-i*3.6,y=70-i*5;p.rect(48-hw,y,hw*2,5,'#d8d0c8');p.rect(48-hw,y,hw*2,1,'#fff6e8');p.rect(48-hw,y+4,hw*2,1,'#8a8078');}
+  p.rect(47,36,3,18,'#e8e0d8');p.poly([[46,36],[48.5,26],[51,36]],'#fff6e8');
+  p.glow(48,60,30,'#ffb070',.35);
+  p.fog(58,76,'#d0603a',.6,4,.05);
+  // oliphant silhouette
+  const ox=160,oy=82,c='#0a0608';
+  p.blob(ox,oy-12,18,13,[c],{noise:0});p.blob(ox-18,oy-14,8,8,[c],{noise:0});[[-12,0],[-4,0],[6,0],[14,0]].forEach(l=>p.rect(ox+l[0]-2,oy-8,5,14,c));
+  p.thick(ox-24,oy-12,ox-30,oy+2,3,c);p.thick(ox-24,oy-9,ox-34,oy-3,1.2,'#d8d0b0');
+  p.rect(ox-8,oy-34,18,10,c);p.rect(ox-6,oy-38,14,5,c);for(let k=0;k<4;k++)p.line(ox-6+k*4,oy-38,ox-6+k*4,oy-48,c);p.line(ox,oy-48,ox+4,oy-52,'#c0482e');
+  p.glow(ox,oy-20,40,'#ff5a20',.3);
+  p.ridge({base:88,amp:6,scale:.03,seed:105,ramp:['#14100e','#2a1e18','#4a362a','#7a5a3a'],v0:.5,vfall:.35,tex:.5});
+  p.glow(110,96,100,'#c0481c',.25);
+  // smoke columns and fires
+  [[84,88],[120,92],[200,90]].forEach((f,i)=>{for(let k=0;k<7;k++)p.blob(f[0]+vn(k,i,1)*5,f[1]-6-k*7,4+k*1.4,3+k,['#0a0608','#1c1214','#3a2424'],{seed:k+i,noise:.4,rough:.3});
+    p.glow(f[0],f[1],16,'#ff7020',.8);p.poly([[f[0]-3,f[1]+2],[f[0],f[1]-7],[f[0]+3,f[1]+2]],'#ff8a20');p.poly([[f[0]-1,f[1]+2],[f[0],f[1]-3],[f[0]+1,f[1]+2]],'#ffe070');});
+  // siege tower wreck + stakes with banners
+  p.rect(14,64,14,30,'#0e0a08');for(let y=66;y<94;y+=6)p.line(14,y,28,y,'#2a1a10');p.line(14,64,28,94,'#2a1a10');
+  [[60,100],[96,104],[176,104]].forEach((b,i)=>{p.rect(b[0],b[1]-16,1,18,'#2a1a10');p.poly([[b[0]+1,b[1]-16],[b[0]+9,b[1]-13],[b[0]+6,b[1]-9],[b[0]+1,b[1]-8]],i%2?'#0a0a0e':'#6a1a14');});
+  for(let i=0;i<50;i++){const x=hash(i,1,6)*220,y=hash(i,2,6)*104;p.set(x,y,pick(['#ff8a30','#ffc060'],hash(i,3,6),x,y));}
+  p.rect(120,106,10,2,'#0a0608');p.rect(30,104,8,2,'#0a0608');
+};
+
+S.minas_tirith=(p)=>{
+  p.grad(0,70,[[0,'#4a80cc'],[.5,'#a8c8ee'],[.85,'#fbe8c0'],[1,'#fcc888']],10);
+  p.clouds(2,36,['#d8a890','#fff0e0','#ffffff'],111,.55,.04);
+  // Mindolluin
+  p.ridge({base:46,amp:30,scale:.014,seed:113,sharp:1.1,ramp:['#3a4668','#5a6a90','#8a9ab8'],v0:.5,vfall:.15,tex:.25,snowLine:26,slope:-10});
+  p.ridge({base:76,amp:12,scale:.016,seed:117,ramp:['#4a6a40','#6a8a4a','#9ab062'],v0:.6,vfall:.3});
+  const wall=['#a8a49c','#d0ccc2','#eeeae0','#ffffff'];
+  // tiers
+  const cx=108;
+  for(let i=0;i<7;i++){const hw=88-i*11,y=92-i*10,h=11;
+    p.rectR(cx-hw,y,hw*2,h,wall,{seed:i+2,tex:.15,k:.45,v0:.6});
+    p.rect(cx-hw,y,hw*2,1,'#ffffff');p.rect(cx-hw,y+h-1,hw*2,1,'#8a8478');
+    for(let x=cx-hw+6;x<cx+hw-4;x+=13+i)p.rect(x,y+1,1,h-2,'#b8b4a8');
+    // little houses on top of each tier
+    for(let x=cx-hw+4;x<cx+hw-10;x+=9){const hh=3+Math.floor(hash(x,i,5)*5);p.rect(x,y-hh,7,hh,pick(['#e8e4d8','#f6f2e8'],hash(x,i,6),x,i));p.poly([[x-1,y-hh],[x+3.5,y-hh-3],[x+8,y-hh]],pick(['#7a8a98','#5a6a7a','#8a7a6a'],hash(x,i,7),x,i));p.set(x+2,y-2,'#2a2a3a');}
+  }
+  // the White Tower
+  p.rectR(cx-5,12,10,46,wall,{seed:3,tex:.1,k:.7});p.rect(cx-5,12,10,1,'#ffffff');
+  p.poly([[cx-6,12],[cx,2],[cx+6,12]],'#f6f2e8');p.line(cx,2,cx,-4,'#fff6e8');p.rect(cx-5,20,10,1,'#b8b4a8');p.rect(cx-5,34,10,1,'#b8b4a8');
+  for(let y=24;y<56;y+=10){p.rect(cx-1,y,2,4,'#2a2a3a');}
+  p.poly([[cx+1,6],[cx+9,8],[cx+1,11]],'#101018');p.set(cx+4,8,'#ffffff');
+  p.glow(cx,30,50,'#ffe0a0',.3);
+  // keel (rock prow)
+  p.poly([[cx-9,92],[cx-2,40],[cx+2,40],[cx+9,92]],(x,y)=>pick(wall,.4+(x<cx?.3:-.2)+(hash(x,y,3)-.5)*.2,x,y));
+  // great gate
+  p.rect(cx-14,92,28,18,'#d8d4ca');p.poly([[cx-8,110],[cx-8,98],[cx,92],[cx+8,98],[cx+8,110]],'#14101a');p.poly([[cx-6,110],[cx-6,99],[cx,94],[cx+6,99],[cx+6,110]],'#3a2a1c');p.line(cx,94,cx,110,'#14101a');
+  p.rect(cx-16,86,3,16,'#ffffff');p.rect(cx+14,86,3,16,'#ffffff');
+  // fields, road
+  p.rect(0,100,cx-30,10,'#4a7a3a');p.rect(cx+30,100,220,10,'#4a7a3a');
+  for(let i=0;i<150;i++){const x=hash(i,1,4)*220,y=100+hash(i,2,4)*10;if(Math.abs(x-cx)<30)continue;p.set(x,y,pick(['#2a5a2a','#7ab04a','#a8d068'],hash(i,3,4),x,y));}
+  p.poly([[cx-6,100],[cx+6,100],[cx+40,110],[cx-40,110]],(x,y)=>pick(['#8a7a5a','#c8b88a','#e8d8a8'],.5+(hash(x,y,3)-.5)*.5,x,y));
+  [[16,0],[194,0]].forEach(b=>{p.rect(b[0],70,1,30,'#2a2a32');p.poly([[b[0]+1,72],[b[0]+9,75],[b[0]+1,82]],'#101018');p.set(b[0]+4,76,'#ffffff');});
+};
+
+S.mordor_road=(p)=>{
+  p.grad(0,70,[[0,'#100608'],[.4,'#3a0e10'],[.75,'#a02a10'],[1,'#f07a20']],11);
+  p.clouds(2,50,['#1a0a0c','#3a1214','#7a2a18'],121,.42,.05);
+  p.glow(110,66,90,'#ff6a1a',.9);
+  // Barad-dur
+  const bd=(x,y)=>pick(['#020102','#0a0608','#1a0e10','#3a1c18'],.3+(hash(x,y,3)-.5)*.3+((x-130)/-14)*.18,x,y);
+  p.poly([[116,78],[118,44],[120,40],[122,32],[124,26],[122,20],[126,14],[132,10],[138,14],[142,20],[140,26],[142,32],[144,40],[146,44],[148,78]],bd);
+  p.poly([[122,20],[118,10],[126,16]],bd);p.poly([[142,20],[146,10],[138,16]],bd);p.poly([[128,12],[130,0],[134,12]],bd);
+  p.glow(132,17,22,'#ff7a10',1);p.blob(132,17,3,6.5,['#ff5a10','#ffb030','#fff0a0'],{noise:0});p.rect(132,13,1,9,'#080204');
+  p.ridge({base:76,amp:16,scale:.018,seed:123,sharp:1.1,ramp:['#050304','#120a0c','#2a1618'],v0:.5,vfall:.2,tex:.3});
+  p.fog(66,84,'#c8481c',.6,5,.05);
+  // ground
+  p.ridge({base:88,amp:8,scale:.03,seed:127,ramp:['#080506','#1a1012','#3a2024','#6a3a30'],v0:.5,vfall:.4,tex:.5});
+  p.poly([[104,88],[116,88],[180,110],[40,110]],(x,y)=>pick(['#1a1012','#3a2a28','#6a5048'],.3+(hash(x,y,3)-.5)*.5+((y-88)/22)*.2,x,y));
+  for(let i=0;i<30;i++){const x=hash(i,1,5)*220,y=90+hash(i,2,5)*20;p.set(x,y,'#ff6a20');if(hash(i,3,5)<.4)p.set(x+1,y,'#ffa040');}
+  // spikes
+  [[6,110,10,34],[26,110,8,20],[200,110,12,40],[180,110,8,22],[70,96,5,12],[150,98,5,10]].forEach((s,i)=>p.poly([[s[0]-s[2],s[1]],[s[0]-1,s[1]-s[3]],[s[0]+1,s[1]-s[3]*.9],[s[0]+s[2],s[1]]],(x,y)=>pick(['#050304','#14090c','#3a1a18','#8a3a24'],.25+((x-s[0])/s[2]<-.2?.3:-.1)+(hash(x,y,2)-.5)*.3,x,y)));
+  for(let i=0;i<60;i++){const x=hash(i,1,6)*220,y=hash(i,2,6)*100;p.set(x,y,pick(['#ff8a30','#ffc060','#c0481c'],hash(i,3,6),x,y));}
+};
+
+S.orodrui=(p)=>{
+  p.grad(0,80,[[0,'#08020a'],[.4,'#3a0a10'],[.8,'#b02a10'],[1,'#ff7a20']],12);
+  p.clouds(2,56,['#12060a','#3a1014','#8a2c18'],131,.4,.05);
+  p.glow(110,50,100,'#ff5a1a',.9);
+  // the mountain
+  p.poly([[30,100],[80,60],[96,40],[102,32],[118,32],[124,40],[140,60],[190,100]],(x,y)=>pick(['#050204','#14080c','#3a1818','#7a3020'],.3+(vn(x*.15,y*.2,3)-.5)*.6+((x-110)/-70)*.2,x,y));
+  p.blob(110,34,12,4,['#ff4a10','#ffb030','#fff0a0'],{noise:.2,lx:0,ly:-1});p.glow(110,32,30,'#ffa030',1);
+  for(let i=0;i<9;i++)p.blob(110+Math.sin(i*1.3)*8,28-i*7,5+i*1.7,4+i*1.1,['#0a0408','#2a0e10','#6a2418'],{seed:i,noise:.4,rough:.3});
+  // lava rivers
+  [[104,38,92,56,80,76,70,100],[116,38,128,58,140,78,156,100],[110,40,108,62,112,80,106,100]].forEach(l=>{for(let t=0;t<=1;t+=.01){const x=(1-t)**3*l[0]+3*(1-t)**2*t*l[2]+3*(1-t)*t*t*l[4]+t**3*l[6],y=(1-t)**3*l[1]+3*(1-t)**2*t*l[3]+3*(1-t)*t*t*l[5]+t**3*l[7];p.thick(x,y,x,y,1.6+t*1.4,pick(['#ff4a10','#ffb030','#fff0a0'],.4+hash(x,y,2)*.4,x,y));}p.glow(l[6],l[7],18,'#ff5a1a',.5);});
+  // foreground ledge
+  p.poly([[0,110],[0,88],[30,84],[60,92],[96,100],[130,98],[170,92],[220,86],[220,110]],(x,y)=>pick(['#030102','#0e0608','#2a1214','#5a2418'],.25+(vn(x*.2,y*.3,5)-.5)*.5+((y-86)<4?.3:0),x,y));
+  p.glow(110,90,80,'#ff5a1a',.4);
+  // hobbit at the edge
+  const hx=150,hy=92;p.poly([[hx-3,hy],[hx-2,hy-8],[hx+2,hy-8],[hx+3,hy]],'#020102');p.circle(hx,hy-10,2.6,'#020102');p.poly([[hx-4,hy-9],[hx,hy-13],[hx+4,hy-9]],'#020102');p.line(hx+3,hy-6,hx+8,hy-9,'#020102');p.set(hx+8,hy-9,'#ffd060');p.glow(hx+8,hy-9,6,'#ffd060',.7);
+  for(let i=0;i<90;i++){const x=hash(i,1,6)*220,y=hash(i,2,6)*100;p.set(x,y,pick(['#ff8a30','#ffc060','#ff4a10'],hash(i,3,6),x,y));}
+};
+})();
+
+/* ===== Sprites for combat + combat banner ===== */
+(function(){
+const U=PixelArt.util;const {vn,hash,pick}=U;
+const SP={};
+function humanoid(p,x,gy,s,o){
+  const cl=o.cloth||['#14100e','#2a2420','#4a4038'],sk=o.skin||['#4a3a2a','#8a6a4a','#c8a070'];
+  p.blob(x-3*s,gy-6*s,2.6*s,6*s,cl,{noise:.3,lx:.6});p.blob(x+3*s,gy-6*s,2.6*s,6*s,cl,{noise:.3,lx:.6});
+  p.blob(x,gy-18*s,7*s,10*s,cl,{seed:2,noise:.4,lx:.6});
+  p.blob(x,gy-31*s,4.4*s,4.6*s,sk,{seed:3,noise:.2,lx:.6});
+  if(o.helm)p.blob(x,gy-33*s,5*s,4.2*s,o.helm,{seed:4,noise:.3,lx:.6});
+  if(o.hood)p.poly([[x-6*s,gy-24*s],[x-1*s,gy-39*s],[x+1*s,gy-39*s],[x+6*s,gy-24*s]],(a,b)=>pick(cl,.35+(hash(a,b,2)-.5)*.3,a,b));
+  p.rect(x-2.5*s,gy-31*s,1.4*s,1.2*s,o.eye||'#ff4020');p.rect(x+1.2*s,gy-31*s,1.4*s,1.2*s,o.eye||'#ff4020');
+  p.thick(x-6*s,gy-24*s,x-10*s,gy-14*s,3*s,cl[1]);p.thick(x+6*s,gy-24*s,x+11*s,gy-18*s,3*s,cl[1]);
+  if(o.weapon==='sword'){p.thick(x+11*s,gy-18*s,x+16*s,gy-40*s,1.4*s,'#c8d0dc');p.rect(x+9*s,gy-18*s,5*s,1.2*s,'#6a4a28');}
+  if(o.weapon==='knife'){p.thick(x+11*s,gy-18*s,x+15*s,gy-28*s,1.2*s,'#c8d0dc');}
+  if(o.weapon==='club'){p.thick(x+11*s,gy-18*s,x+14*s,gy-42*s,3*s,'#4a3220');}
+  if(o.weapon==='saber'){p.thick(x+11*s,gy-18*s,x+18*s,gy-36*s,1.6*s,'#a8b0b8');p.thick(x+18*s,gy-36*s,x+21*s,gy-40*s,1.6*s,'#a8b0b8');}
+  if(o.weapon==='bigsword'){p.thick(x+11*s,gy-18*s,x+20*s,gy-46*s,2*s,'#9aa4b0');}
+}
+SP.wolf=(p,x,gy,s)=>{const c=['#14161a','#3a3e46','#6a707c','#a0a6b0'];
+  [[-12,0],[-6,0],[8,0],[14,0]].forEach(l=>p.thick(x+l[0]*s,gy-10*s,x+l[0]*s,gy,3*s,c[1]));
+  p.blob(x,gy-14*s,17*s,8*s,c,{seed:2,noise:.4,rough:.15});p.blob(x+16*s,gy-20*s,7*s,6*s,c,{seed:3,noise:.3});
+  p.poly([[x+19*s,gy-22*s],[x+28*s,gy-18*s],[x+19*s,gy-15*s]],c[2]);p.rect(x+27*s,gy-19*s,2*s,2*s,'#101010');
+  p.poly([[x+14*s,gy-24*s],[x+15*s,gy-30*s],[x+18*s,gy-25*s]],c[1]);p.poly([[x+18*s,gy-25*s],[x+20*s,gy-30*s],[x+22*s,gy-24*s]],c[1]);
+  p.rect(x+21*s,gy-21*s,2*s,1.5*s,'#ffd030');p.glow(x+22*s,gy-20*s,6*s,'#ffd030',.5);p.rect(x+24*s,gy-16*s,1.5*s,2*s,'#ffffff');
+  p.thick(x-17*s,gy-18*s,x-26*s,gy-10*s,3*s,c[1]);};
+SP.warg=(p,x,gy,s)=>{SP.wolf(p,x,gy,s*1.15);p.rect(x-2*s,gy-26*s,8*s,3*s,'#2a1a10');p.blob(x+2*s,gy-30*s,3*s,4*s,['#1a2a14','#3a5a28'],{noise:.3});};
+SP.bandit=(p,x,gy,s)=>humanoid(p,x,gy,s,{cloth:['#1a1410','#3a2c20','#5a4630'],hood:true,weapon:'knife',eye:'#ffe0a0'});
+SP.goblin=(p,x,gy,s)=>{s*=.8;humanoid(p,x,gy,s,{cloth:['#1a1a10','#3a3a22','#5a5a38'],skin:['#2a4a22','#4a7a32','#88b050'],weapon:'club',eye:'#ffe030'});
+  p.poly([[x-5*s,gy-32*s],[x-12*s,gy-36*s],[x-5*s,gy-28*s]],'#4a7a32');p.poly([[x+5*s,gy-32*s],[x+12*s,gy-36*s],[x+5*s,gy-28*s]],'#4a7a32');};
+SP.orc=(p,x,gy,s)=>humanoid(p,x,gy,s,{cloth:['#100c0a','#2a2018','#4a3a2c'],skin:['#2a3a22','#4a5a32','#7a8a4a'],helm:['#1a1a20','#3a3a44','#6a6a76'],weapon:'saber'});
+SP.uruk=(p,x,gy,s)=>{humanoid(p,x,gy*1,s*1.12,{cloth:['#06060a','#14141c','#2a2a34'],skin:['#1a2418','#2a3a22','#4a5a34'],helm:['#08080c','#1c1c26','#3a3a48'],weapon:'bigsword',eye:'#ffa010'});p.rect(x-1,gy-40*s,2,4,'#e8e8e8');p.rect(x-2,gy-39*s,4,1.4,'#e8e8e8');};
+SP.troll=(p,x,gy,s)=>{const st=['#1c2420','#3a4a40','#5e7468','#98ac94'];s*=1.5;
+  p.blob(x-6*s,gy-6*s,4.5*s,6*s,st,{seed:3,noise:.5,rough:.15});p.blob(x+6*s,gy-6*s,4.5*s,6*s,st,{seed:4,noise:.5,rough:.15});
+  p.blob(x,gy-19*s,11*s,14*s,st,{seed:5,noise:.55,rough:.12});
+  p.blob(x-12*s,gy-20*s,4*s,11*s,st,{seed:6,noise:.5});p.blob(x+13*s,gy-17*s,4.5*s,11*s,st,{seed:7,noise:.5});
+  p.blob(x+2*s,gy-35*s,6.5*s,5.5*s,st,{seed:8,noise:.5});p.rect(x-3*s,gy-37*s,10*s,1.4*s,'#0c1210');p.rect(x-1*s,gy-35*s,2*s,1.5*s,'#ff4020');p.rect(x+4*s,gy-35*s,2*s,1.5*s,'#ff4020');
+  p.rect(x-1*s,gy-31*s,8*s,2*s,'#0c1210');p.rect(x,gy-31*s,1*s,2.4*s,'#e8e0c0');p.rect(x+4*s,gy-31*s,1*s,2.4*s,'#e8e0c0');
+  p.thick(x+14*s,gy-14*s,x+20*s,gy-40*s,3.6*s,'#4a3220');p.blob(x+20*s,gy-42*s,4*s,4*s,['#3a2616','#6a4a2c','#8a6a40'],{noise:.4});};
+SP.spider=(p,x,gy,s)=>{const c=['#06060a','#14141c','#2a2a38'];s*=1.2;
+  for(let i=0;i<4;i++){const a=(i+.5)*8*s;[-1,1].forEach(d=>{p.thick(x+d*4*s,gy-14*s,x+d*(10+i*5)*s,gy-26*s+i*2*s,1.6*s,c[1]);p.thick(x+d*(10+i*5)*s,gy-26*s+i*2*s,x+d*(14+i*5)*s,gy,1.6*s,c[1]);});}
+  p.blob(x-8*s,gy-16*s,12*s,10*s,c,{seed:3,noise:.4,lx:.5});p.blob(x+9*s,gy-15*s,7*s,6*s,c,{seed:4,noise:.4});
+  [[5,-2],[8,-3],[11,-2],[8,0]].forEach(e=>{p.rect(x+e[0]*s,gy-18*s+e[1]*s,1.6*s,1.6*s,'#ff2a10');});p.glow(x+9*s,gy-17*s,10*s,'#ff2a10',.4);
+  p.poly([[x+13*s,gy-11*s],[x+16*s,gy-5*s],[x+12*s,gy-9*s]],'#d8d8d0');p.poly([[x+10*s,gy-10*s],[x+10*s,gy-4*s],[x+8*s,gy-9*s]],'#d8d8d0');
+  p.poly([[x-8*s,gy-22*s],[x-4*s,gy-12*s],[x-12*s,gy-12*s]],'#8a1a14');};
+SP.rider=(p,x,gy,s)=>{const c=['#020204','#0a0a10','#1a1a24'];
+  [[-12,0],[-6,0],[8,0],[14,0]].forEach(l=>p.thick(x+l[0]*s,gy-14*s,x+l[0]*s,gy,3*s,c[1]));
+  p.blob(x,gy-20*s,17*s,9*s,c,{seed:2,noise:.3});p.blob(x+17*s,gy-30*s,6*s,7*s,c,{seed:3,noise:.3});p.poly([[x+19*s,gy-30*s],[x+28*s,gy-22*s],[x+19*s,gy-20*s]],c[1]);
+  p.rect(x+21*s,gy-30*s,2*s,2*s,'#ff3020');p.glow(x+22*s,gy-29*s,6*s,'#ff3020',.5);
+  p.poly([[x-8*s,gy-26*s],[x-2*s,gy-52*s],[x+3*s,gy-52*s],[x+9*s,gy-26*s],[x+12*s,gy-16*s],[x-14*s,gy-14*s]],(a,b)=>pick(c,.25+(hash(a,b,2)-.5)*.4+((a-x)<0?.12:0),a,b));
+  p.blob(x,gy-50*s,3.6*s,4*s,['#000000'],{noise:0});p.rect(x-1.6*s,gy-50*s,1.2*s,1*s,'#9ac8ff');p.rect(x+.6*s,gy-50*s,1.2*s,1*s,'#9ac8ff');
+  p.thick(x+8*s,gy-36*s,x+20*s,gy-58*s,1.5*s,'#c8d0e8');p.glow(x+8*s,gy-40*s,50*s,'#304880',.18);};
+SP.nazgul=(p,x,gy,s)=>{const c=['#020206','#0a0a14','#1a1a2c'];s*=1.2;
+  p.poly([[x-14*s,gy],[x-6*s,gy-34*s],[x+6*s,gy-34*s],[x+14*s,gy],[x+6*s,gy-5*s],[x-4*s,gy-2*s]],(a,b)=>pick(c,.25+(hash(a,b,2)-.5)*.4+vn(a*.3,b*.1,3)*.2,a,b));
+  p.blob(x,gy-40*s,5*s,6*s,['#000000'],{noise:0});p.poly([[x-5*s,gy-44*s],[x-4*s,gy-50*s],[x-1*s,gy-46*s],[x,gy-52*s],[x+1*s,gy-46*s],[x+4*s,gy-50*s],[x+5*s,gy-44*s]],'#4a4a60');
+  p.rect(x-2.5*s,gy-41*s,1.6*s,1.4*s,'#b0e0ff');p.rect(x+1*s,gy-41*s,1.6*s,1.4*s,'#b0e0ff');p.glow(x,gy-41*s,12*s,'#6090ff',.6);
+  p.thick(x+8*s,gy-26*s,x+18*s,gy-54*s,1.8*s,'#c8d0e8');p.glow(x,gy-24*s,56*s,'#304cb0',.22);};
+// player hobbit (faces right)
+function hobbit(p,x,gy,s){
+  p.blob(x-2*s,gy-2*s,2.6*s,2*s,['#4a3020','#8a6a48','#c8a070'],{noise:.2});p.blob(x+3*s,gy-2*s,2.6*s,2*s,['#4a3020','#8a6a48','#c8a070'],{noise:.2});
+  p.blob(x,gy-10*s,5.4*s,7*s,['#1a2a14','#2f5a28','#58903c'],{seed:3,noise:.3,lx:.5});
+  p.poly([[x-5*s,gy-16*s],[x+5*s,gy-16*s],[x+7*s,gy-3*s],[x-7*s,gy-3*s]],(a,b)=>pick(['#1a1a14','#3a3a28','#5a5a3c'],.4+(hash(a,b,2)-.5)*.3+((a-x)<0?.1:0),a,b));
+  p.blob(x,gy-21*s,4*s,4*s,['#6a4a30','#c89868','#f0c898'],{seed:4,noise:.15,lx:.4});
+  p.blob(x,gy-24*s,4.4*s,2.4*s,['#2a1608','#5a3418','#7a4a22'],{seed:5,noise:.6,rough:.3});
+  p.rect(x+1*s,gy-21*s,1.2*s,1.2*s,'#1a1a1a');p.rect(x-2*s,gy-21*s,1.2*s,1.2*s,'#1a1a1a');
+  p.thick(x+3*s,gy-12*s,x+9*s,gy-14*s,2.4*s,'#c89868');p.thick(x+9*s,gy-14*s,x+16*s,gy-20*s,1.1*s,'#d8e4f0');p.thick(x+9*s,gy-14*s,x+16*s,gy-20*s,.5*s,'#ffffff');p.rect(x+7*s,gy-15*s,3*s,1.2*s,'#6a4a28');
+  p.glow(x+16*s,gy-20*s,8*s,'#a0d0ff',.35);
+}
+function combat(cv,locId,enemyKey,time,weather,hit){
+  const bg=PixelArt.base(locId)||PixelArt.base('hobbiton');
+  let p=PixelArt.atmosphere(bg,time,weather,5,PixelArt.meta[locId]||{});
+  // darken backdrop for contrast
+  for(let i=0;i<p.d.length;i+=4){p.d[i]*=.78;p.d[i+1]*=.78;p.d[i+2]*=.8;}
+  // ground shadow strip
+  for(let y=96;y<110;y++)for(let x=0;x<220;x++)p.mixpx(x,y,'#000000',.25*((y-96)/14)+.1);
+  hobbit(p,44,102,1.55);
+  const f=SP[enemyKey];
+  if(f){const q=new PixelArt.Pic(220,110);q.d.set(p.d);
+    p.rect(0,0,0,0,'#000');
+    p.glow(156,98,44,'#000000',.5);
+    f(p,160,102,enemyKey==='spider'?1.7:enemyKey==='troll'?1.4:1.7);}
+  if(hit){for(let i=0;i<p.d.length;i+=4){p.d[i]=Math.min(255,p.d[i]+70);}}
+  p.toCanvas(cv);
+}
+PixelArt.SPRITES=SP;PixelArt.combat=combat;
+})();
+
+</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const roll=s=>1+Math.floor(Math.random()*s);
+const randInt=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const chance=p=>Math.random()<p;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const SAVE_KEY='rivendell_hobbit_v6';
+
+const EAT_LOCS=new Set(['hobbiton','bree','rivendell','rivendell_leave','fangorn','rohan','minas_tirith']);
+
+const WEATHER={clear:{name:'Ясно',icon:'☀'},cloudy:{name:'Облачно',icon:'☁'},rain:{name:'Дождь',icon:'🌧'},fog:{name:'Туман',icon:'🌫'},storm:{name:'Гроза',icon:'⛈'}};
+const TIMES={day:{name:'День',icon:'☀'},evening:{name:'Вечер',icon:'🌆'},night:{name:'Ночь',icon:'🌙'}};
+const TRAITS={
+  curious:{name:'Любопытный',desc:'Чаще находит тайны.',bonuses:{luck:2,courage:0}},
+  careful:{name:'Осторожный',desc:'Легче прячется и сбегает.',bonuses:{luck:1,courage:-1},startFood:-1},
+  stubborn:{name:'Упрямый',desc:'Лучше дерётся и терпит голод.',bonuses:{courage:2,luck:-1}},
+  dreamer:{name:'Мечтательный',desc:'Больше знаков. Слабее в бою.',bonuses:{luck:1,courage:1}}
+};
+const ITEMS={
+  food:{name:'Еда',desc:'Есть — только в тавернах и приютах.',icon:'🍞'},
+  herbs:{name:'Лечебные травы',desc:'Атэлас и полевые травы.',icon:'🌿'},
+  elvenBread:{name:'Эльфийский хлеб',desc:'Лембас. Можно в пути и в бою.',icon:'✨'},
+  torch:{name:'Факел',desc:'Свет в темноте.',icon:'🔥'},
+  armor:{name:'Кольчуга',desc:'Лёгкая защита.',icon:'🛡️'},
+  ring:{name:'Кольцо',desc:'Холодное на ощупь.',icon:'💍'},
+  pipeweed:{name:'Трубочное зелье',desc:'Кусочек дома.',icon:'🍃'},
+  sword:{name:'Клинок Запада',desc:'Эльфийская или гондорская сталь.',icon:'⚔️'}
+};
+const ENEMIES={
+  wolf:{name:'Волк',desc:'Голодный, с горящими глазами.',intro:'Из чащи выходит волк. Рёбра проступают под шкурой, глаза горят голодным янтарём; он не рычит, а ждёт, когда ты дашь ему повод.',hp:18,defense:9,dmg:[2,6],xp:10,art:'🐺'},
+  bandit:{name:'Разбойник',desc:'Оборванец с ножом.',intro:'Из-за дерева выступает человек в рваном плаще. Нож в его руке не блестит, но держит он его так, будто пользовался им не раз.',hp:24,defense:10,dmg:[3,7],xp:14,art:'🗡️'},
+  goblin:{name:'Гоблин',desc:'Визгливый и злобный.',intro:'Скрежещущий визг бьёт по стенам. Из мрака выскакивает гоблин — кривоногий, жёлтоглазый, с зазубренным тесаком.',hp:22,defense:10,dmg:[3,8],xp:12,art:'👺'},
+  troll:{name:'Тролль',desc:'Огромный и сильный.',intro:'Камень ожил. Тролль поворачивает к тебе огромную голову, и земля вздрагивает от его вздоха.',hp:50,defense:12,dmg:[5,11],xp:32,art:'👹'},
+  spider:{name:'Огромный паук',desc:'Ядовитые жвалы.',intro:'Паутина серебрится между стволами, и по ней, неспешно, сверху вниз спускается нечто с множеством глаз.',hp:30,defense:11,dmg:[4,8],xp:18,art:'🕷️'},
+  rider:{name:'Чёрный всадник',desc:'Холод и ужас.',intro:'Мир выцветает. Чёрный всадник поднимает руку, и воздух вымерзает до самого сердца.',hp:80,defense:14,dmg:[9,16],xp:65,art:'🏇'},
+  orc:{name:'Орк',desc:'Скрипучий доспех, кривая сабля.',intro:'Орк с кривой саблей выступает из дыма. Он смеётся — сухо, как скрипит ржавая петля.',hp:24,defense:11,dmg:[3,8],xp:14,art:'😈'},
+  uruk:{name:'Урук-хай',desc:'Крупнее орка, сильнее и злее.',intro:'Урук-хай загораживает путь. Белая ладонь на его чёрном шлеме смотрит на тебя, как лицо без глаз.',hp:38,defense:12,dmg:[5,11],xp:26,art:'👿'},
+  warg:{name:'Варг',desc:'Огромный волк под седлом орка.',intro:'Варг вылетает из темноты, и на его спине скалится орк. С клыков, длиной в твой палец, течёт слюна.',hp:32,defense:11,dmg:[4,9],xp:20,art:'🐕'},
+  nazgul:{name:'Назгул',desc:'Безликий ужас.',intro:'Крик, от которого останавливается сердце. Назгул не движется — он просто присутствует, и всё вокруг становится мёртвым и лишним.',hp:95,defense:15,dmg:[11,20],xp:95,art:'👻'}
+};
+const PATH_ACT1=['Хоббитон','Дорога','Бри','Чаща','Тролли','Горы','Пещеры','Перевал','Ривенделл'];
+const PATH_ACT2=['Ривенделл','Юг','Изенгард','Фангорн','Рохан','Пеленнор','Минас Тирит','К Мордору','Ородруин'];
+const FLAVOR={
+  time:{day:['День стоит ясный и ровный; тени коротки и послушны.','Свет дня лёгок и щедр, и дорога кажется короче, чем есть.'],
+    evening:['Вечер медленно собирает свет в карманы и прячет его до утра.','Закат ложится на землю тёплой медью, и тени тянутся длинными пальцами.'],
+    night:['Ночь легла на землю тяжело и тихо; звёзды мерцают, как далёкие костры.','Темнота стоит вокруг плотной стеной, и каждый звук в ней приобретает имя.']},
+  weather:{cloudy:['Облака ползут низко, и свет под ними становится серым и безразличным.','Небо затянуто, и мир потерял тени.'],
+    rain:['Дождь идёт мелкий и упорный, как давняя обида; плащ темнеет от плеч до подола.','Капли стучат по листьям так ровно, что кажется, будто кто-то отсчитывает твои шаги.'],
+    fog:['Туман затянул округу молоком, и звуки плывут в нём без направления.','В тумане знакомое становится чужим, а чужое — слишком близким.'],
+    storm:['Гроза ворочается над головой; молнии выхватывают из тьмы мир и снова оставляют его слепым.','Гром катится по небу, как тяжёлая бочка, и воздух пахнет железом.']}};
+function flavorText(){const i=((state.day||1)+(state.locationIndex||0))%2;const w=FLAVOR.weather[state.weather];return (w||FLAVOR.time[state.time]||FLAVOR.time.day)[i];}
+const LOCATION_ART={
+  hobbiton:'🌿 🏠 🌳',bree_road:'🌾 ～ 🛤️',bree:'🍺 🏡 🔥',forest:'🌲 🌲 🌲',
+  trolls:'🪨 👹 🪨',mountains:'⛰️ ☁️ ⛰️',caves:'🕳️ 👺 🔦',last:'🌄 ～ 🍃',
+  rivendell:'🏞️ ✨ 🏛️',south_road:'🛤️ 🌄 🌬️',isengard:'🏭 🌑 🗼',fangorn:'🌳 🌳 👁️',
+  rohan:'🐴 🌾 🏰',pelennor:'⚔️ 🌅 🐎',minas_tirith:'🏰 🤍 ⛰️',mordor_road:'🌋 ⬛ 🔥',orodrui:'🌋 💍 🔥'
+};
+
+const LOC_ACT1=[
+  {id:'hobbiton',name:'Хоббитон и окрестности',art:'hobbiton',act:1,
+    desc:['Утро поднялось над Хоббитоном медленно и золотисто, как мёд, стекающий с ложки. Холмы лежат в росе, из круглых окошек тянет дымком и свежим хлебом, а над прудом кричат утки, которым нет дела ни до королей, ни до теней.',
+    'Ты стоишь на пороге своей норы, и зелёная круглая дверь за спиной ещё хранит тепло очага. Тропа, бегущая вниз по склону, такая же, как вчера и позавчера. Но старые хоббиты говорят: порог — самое опасное место на свете, ибо стоит его переступить — и дорога уже не спросит, готов ли ты.',
+    'В котомке мало еды, у пояса — старый кинжал, служивший скорее для резки сыра, чем для чего-либо иного. Впереди Бри, а за ним то, о чём в Шире не говорят вслух.'],
+    specials:[
+      {id:'pack',label:'Собрать котомку',once:true,run:()=>{state.player.inventory.food+=3;state.player.inventory.herbs+=1;state.player.inventory.torch+=1;gainXp(4);addLog('Ты складываешь в котомку краюху хлеба, круг сыра, пучок трав из материнского сада и огарок факела. Небогато, но дорога съест всё это быстрее, чем ты думаешь.','good');markKey('Собрал котомку');}},
+      {id:'farewell',label:'Попрощаться с родными',once:true,run:()=>{state.player.courage+=1;state.flags.saidFarewell=true;gainXp(3);addLog('Мать молча вкладывает тебе в руки свёрток, отец — старую трубку. Ты хочешь сказать что-нибудь значительное, но выходит лишь «до скорого». И всё же они слышат в этом больше, чем ты вложил.','good');markKey('Попрощался с родными');}}
+    ],leaveLabel:'Отправиться в путь',onLeave:()=>addLog('Дверь закрывается за спиной с тихим щелчком, и ты вдруг слышишь, как велик мир.','story')},
+  {id:'bree_road',name:'Дорога к Бри',art:'bree_road',act:1,
+    desc:['Дорога вьётся между жёлтых полей, и колосья шепчутся по обе её стороны, словно передают друг другу весть о путнике. Живые изгороди редеют, межевые камни становятся старше, а слова на них — незнакомее. Шир остался позади не сразу, а как остаются тёплые края одеяла, когда встаёшь затемно.',
+    'С каждой милей воздух чуть острее, а тени придорожных дубов чуть длиннее. Ты ловишь себя на том, что оглядываешься, и не знаешь, чего именно надеешься не увидеть.',
+    'К вечеру на холме впереди загораются огни Бри — маленькие, жёлтые и очень человеческие.'],
+    specials:[{id:'forage',label:'Собрать ягоды / коренья',once:true,run:()=>{state.player.inventory.food+=1;gainXp(3);addLog('В канаве за кустом шиповника ты находишь спелые ягоды и пару сладких кореньев. Хоббит, умеющий смотреть под ноги, редко остаётся голодным.','good');}}],
+    leaveLabel:'Идти к Бри',onLeave:()=>addLog('Впереди чужие огни, и сердце бьётся не от страха, а от ожидания.','story')},
+  {id:'bree',name:'Бри — «Гарцующий пони»',art:'bree',act:1,
+    desc:['Бри встречает тебя дымом, запахом эля и гулом голосов, которые на миг стихают, когда ты переступаешь порог «Гарцующего пони». Люди смотрят сверху вниз, но без злобы: в этих стенах повидали всякий народ, и коротышек тоже.',
+    'Огонь в очаге низок и красен. Под потолком, закопчённым за триста зим, плывёт трубочный дым, и в нём, как в тумане над рекой, покачиваются песни. У дальнего края камина, в тени, сидит человек в потёртом сером плаще: он ничего не пьёт и ничего не говорит, но, кажется, слышит всё.',
+    'Здесь можно поесть, перевести дух и поспать под крышей. Дальше такой роскоши не будет.'],
+    specials:[
+      {id:'tavern',label:'Войти в таверну',once:true,run:()=>{state.player.courage+=1;state.player.inventory.food+=2;gainXp(4);addLog('Хозяйка ставит перед тобой миску густой похлёбки и кружку тёмного эля. Тепло разливается по телу, песня в углу кажется добрее, чем была, и ты прячешь в котомку ещё пару краюх про запас. (+2 еды)','good');}},
+      {id:'stranger',label:'Подойти к человеку в сером',once:true,run:()=>startScene('stranger_grey')},
+      {id:'innkeeper',label:'Поговорить с трактирщиком',once:true,run:()=>{if(roll(20)>=11){state.player.inventory.elvenBread+=1;gainXp(3);addLog('Барлиман достаёт из-под стойки лепёшку в зелёном листе: «Её оставил один путник, а ему она уже без надобности. Береги».','good');}else{state.player.inventory.food+=1;addLog('Трактирщик сует тебе краюху хлеба и говорит негромко: «На востоке неспокойно. Увидишь на дороге чёрное — сворачивай, не раздумывая».','info');}}},
+      {id:'sleep',label:'Переночевать',once:true,run:()=>{state.player.hp=clamp(state.player.hp+15,0,state.player.maxHp);state.player.stamina=clamp(state.player.stamina+12,0,state.player.maxStamina);state.player.hunger=clamp(state.player.hunger-10,0,state.player.maxHunger);advanceTime();gainXp(2);addLog('Постель жестка, одеяло колется, но ты спишь, как не спал со времён Хоббитона, и снятся тебе только тихие вещи: чайник, дождь по крыше, отцовские шаги в сенях.','good');}}
+    ],leaveLabel:'Выйти из Бри',onLeave:()=>{state.player.inventory.food+=1;addLog('Хозяин сует тебе свёрток с пайком. Восточная тропа уходит в сумерки, и в вереске уже шевелится ночной ветер.','story');}},
+  {id:'forest',name:'Чаща и старая дорога',art:'forest',act:1,
+    desc:['За Бри тракт превращается в тропу, а тропа — в воспоминание о ней. Деревья смыкаются над головой, и свет падает сквозь листву зеленоватыми столбами, в которых лениво кружится пыльца. Мох покрыл корни так густо, что шаги звучат как шаги во сне.',
+    'Лес не враждебен: он просто очень стар и очень занят собственными мыслями. Но порой скрипнет ветка, когда нет ветра, и тебе чудится, что за тобой не идут, а наблюдают.',
+    'Тишина с каждым шагом становится плотнее. Даже птицы поют здесь вполголоса.'],
+    specials:[
+      {id:'wounded',label:'Осмотреть придорожный куст',once:true,run:()=>startScene('wounded_man')},
+      {id:'forage2',label:'Искать грибы / орехи',once:true,run:()=>{if(roll(20)+state.player.luck>=10){state.player.inventory.food+=1;gainXp(3);addLog('Под корнями старого бука ты находишь орехи и россыпь рыжих грибов, которых не побоишься съесть. Лес, оказывается, кормит тех, кто смотрит.','good');}else addLog('Пусто.','info');}}
+    ],leaveLabel:'Идти дальше',onLeave:()=>addLog('Между стволами проступают каменные силуэты — слишком большие и слишком неподвижные.','story')},
+  {id:'trolls',name:'Камни троллей',art:'trolls',act:1,
+    desc:['Тропа выводит на прогалину, где среди сосен стоят три каменные фигуры — огромные, сгорбленные, застывшие в споре, который не успели закончить. Рассвет коснулся их плеч розовым, и на миг кажется, что они дышат.',
+    'У их ног — потухшее кострище, чёрный котёл, в котором сварился бы целый обоз, и кости, обглоданные задолго до твоего рождения. Говорят, тролли, застигнутые солнцем, обращаются в камень навсегда. Говорят также, что не все они об этом знают.',
+    'Можно обыскать лагерь. Можно подойти ближе. Можно уйти, не оглядываясь, но любопытство хоббита сильнее страха.'],
+    specials:[
+      {id:'search_trolls',label:'Обыскать лагерь троллей',once:true,run:()=>{const c=roll(20)+state.player.luck+Math.floor(state.player.courage/2);if(c>=14){state.player.inventory.armor+=1;state.player.armor=1;state.player.inventory.food+=2;gainXp(6);addLog('Под грудой тряпья ты откапываешь кольчугу — сделанную, кажется, для эльфийского отрока, но на хоббита она садится, как влитая. Рядом лежит мешок с провизией, которую тролли не успели съесть.','good');}else if(c>=8){state.player.inventory.food+=1;gainXp(3);addLog('В остывшей золе — несколько кусков вяленого мяса, жёстких, как подошва, но пахнущих жизнью.','info');}else addLog('Лишь пыль, кости и ржавые железки. Тролли, как видно, ничего не копили, кроме голода.','info');}},
+      {id:'troll_choice',label:'Подойти ближе к камням',once:true,run:()=>startScene('troll_scene')}
+    ],leaveLabel:'Уйти от камней',onLeave:()=>addLog('Ты оставляешь великанов позади, и на горизонте встаёт серая стена Туманных гор.','story')},
+  {id:'mountains',name:'Подступы к Туманным горам',art:'mountains',act:1,
+    desc:['Серая стена Туманных гор встаёт от края до края земли, и вершины её теряются в облаках, словно мир кончается там, где начинается небо. Снег лежит на кручах нетронутым, а ветер несёт с них ледяную крупу.',
+    'Тропа, по которой когда-то ходили гномы и торговцы, поднимается зигзагами по осыпям. Внизу, в сосновом сумраке, ещё пахнет смолой и жильём; выше пахнет только камнем и холодом.',
+    'Говорят, под корнями этих гор живут гоблины. Говорят шёпотом и всегда добавляют: не ходи туда ночью.'],
+    specials:[{id:'cache',label:'Обыскать тайник путников',once:true,run:()=>{state.player.inventory.food+=1;state.player.inventory.torch+=1;gainXp(4);addLog('В щели между камнями путники оставили сухари и огарок факела — маленькая забота незнакомцев о тех, кто придёт после.','good');}}],
+    leaveLabel:'Подняться выше',onLeave:()=>addLog('Тропа ползёт вверх, лёгкие горят, и каждый шаг даётся с боем.','story')},
+  {id:'caves',name:'Пещеры Туманных гор',art:'caves',act:1,
+    desc:['Свет остался позади, как забытая дверь. В расщелине сыро и тесно; своды уходят в чёрное, откуда медленно срываются капли, и каждый их удар о камень повторяется эхом, будто кто-то в глубине отвечает.',
+    'Факел отбрасывает дрожащий круг, а за кругом — глубина, которой не измерить. Над пропастью перекинут мост из старых досок и гнилых канатов; под ним тускло, багрово светится что-то, чему лучше не знать имени.',
+    'Во тьме иногда мелькают красные точки: пара, потом ещё пара. Это не звёзды. Здесь нужно быть очень тихим и очень удачливым.'],
+    specials:[
+      {id:'sneak',label:'Красться осторожно',once:true,run:()=>{const b=state.player.trait==='careful'?4:0;if(roll(20)+state.player.luck+b>=13){state.player.inventory.herbs+=1;state.player.inventory.food+=1;gainXp(6);addLog('Ты замираешь, прижавшись к стене, и гоблинский дозор, воняя дымом и сырой кожей, проходит в трёх шагах, не заметив тебя. Потом в нише ты находишь грибы и вяленое мясо: тот, кто их прятал, уже не вернётся.','good');state.flags.sneakedWell=true;}else{addLog('Гоблины!','bad');startCombat('goblin');}}},
+      {id:'listen',label:'Прислушаться',once:true,run:()=>{gainXp(2);if(state.player.trait==='dreamer'||chance(.4))addLog('Где-то в глубине слышен шёпот на языке, которого ты не знаешь. Он то стихает, то возвращается, и в нём слышится не угроза, а голод.','story');else addLog('Только капли, падающие в тишину, и собственное сердце.','info');}}
+    ],leaveLabel:'Искать выход',onLeave:()=>{
+      if(!state.flags.caveExitDone){state.flags.caveExitDone=true;addLog('Далеко впереди узкая трещина пропускает бледную полоску света. Ты идёшь к ней, как на зов.','story');startScene('cave_exit');}
+      else addLog('Пещеры остались позади, но их холод ещё долго живёт в костях.','story');
+    }},
+  {id:'last',name:'Последний переход',art:'last',act:1,
+    desc:['Тропа спускается в долину, и вместе с ней спускается покой. Воздух мягок, как шерсть, пахнет мокрым камнем, опавшей листвой и дымком далёких очагов. Берёзы роняют золотые листья тебе под ноги, словно стелют путь для кого-то более важного.',
+    'Высоко над скалами падают два водопада, и шум их доносится не как гром, а как давняя неторопливая песня. А далеко внизу, в складке гор, мерцает свет — тёплый и ровный, не похожий на костёр.',
+    'Это Ривенделл. Но прежде чем ты дойдёшь, обочина тропы приберегла для тебя ещё одну тихую неожиданность.'],
+    specials:[
+      {id:'glint',label:'Что-то блестит у тропы',once:true,run:()=>{
+        if(state.flags.ringFound||(state.player.inventory.ring|0)>0){addLog('Лишь роса на камне, и ничего больше. Но ты ещё долго оглядываешься.','info');return;}
+        startScene('find_ring');
+      }},
+      {id:'rest_final',label:'Перевести дух',once:true,run:()=>{state.player.stamina=clamp(state.player.stamina+8,0,state.player.maxStamina);state.player.hp=clamp(state.player.hp+5,0,state.player.maxHp);gainXp(3);addLog('Ты садишься на тёплый камень и просто дышишь. Воздух долины мягок и сладок, и усталость уходит из ног, как вода из подставленной ладони.','good');}},
+      {id:'elf_scout',label:'Позвать тихо',once:true,run:()=>{if(state.flags.helpedWounded||state.player.trait==='dreamer'||chance(.55))startScene('elf_help');else addLog('Никто не отвечает.','info');}}
+    ],
+    leaveLabel:'Идти к Ривенделлу',onLeave:()=>{
+      if(!state.flags.ringFound&&!(state.player.inventory.ring>0)&&!state.flags.leftRingOnRoad&&!state.flags.ringForced){
+        state.flags.ringForced=true;
+        addLog('Перед самым спуском ты снова замечаешь тусклый блеск у тропы — как будто вещь не хочет, чтобы её забыли.','story');
+        startScene('find_ring');
+        return;
+      }
+      addLog('Между деревьями уже видны белые террасы и тонкие мосты, и ты понимаешь, что слёзы на щеках — не от ветра.','story');
+    }},
+  {id:'rivendell',name:'Ривенделл',art:'rivendell',act:1,
+    desc:['Здесь нет спешки. Вода поёт в каменных желобах, мосты выгибаются над ущельем, как ресницы, и каждая арка словно выросла, а не была построена. Осенняя листва рдеет на уступах, и золотая пыль её тихо опускается на белый камень.',
+    'Дом Элронда — убежище для всех, кто устал, и для всех, кто знает слишком много. Эльфы проходят по галереям, едва касаясь пола, и поют на языке, в котором каждое слово помнит мир юным. Ты вдруг осознаёшь, как давно не мылся, и как мало это здесь значит.',
+    'Можно поесть, отдохнуть и предстать перед хозяином дома. Но тот, кто пришёл сюда лишь за отдыхом, нередко уходит с поручением.'],
+    specials:[
+      {id:'council',label:'Предстать перед Элрондом',once:true,run:()=>startScene('rivendell_council')},
+      {id:'rest_riv',label:'Отдохнуть в Ривенделле',once:true,run:()=>{state.player.hp=state.player.maxHp;state.player.stamina=state.player.maxStamina;state.player.hunger=Math.max(0,state.player.hunger-35);state.player.inventory.elvenBread+=2;state.player.inventory.food+=2;state.player.inventory.herbs+=2;if(!state.player.inventory.sword){state.player.inventory.sword=1;state.player.weapon=Math.max(state.player.weapon,2);}gainXp(8);addLog('Эльфы омывают твои раны, ставят перед тобой хлеб и мёд и дарят тонкий клинок, который сам ложится в ладонь. Ты засыпаешь — и впервые за долгое время ничего не видишь во сне. Это лучший сон на свете.','good');state.flags.restedInRivendell=true;}}
+    ],leaveLabel:'Продолжить путь на юг',onLeave:()=>{
+      if(!state.flags.councilDone){addLog('Сначала — Элронд.','info');state.flags.leaveBlocked=true;return;}
+      summarizeAct1();state.act=2;state.locationIndex=0;state.player.inventory.food+=2;
+      addLog('Ривенделл остаётся позади, как свет в окне, мимо которого проходишь ночью. В котомке два пайка, в сердце — тихое понимание: назад дороги нет.','story');
+    }}
+];
+
+const LOC_ACT2=[
+  {id:'rivendell_leave',name:'Прощание с Ривенделлом',art:'rivendell',act:2,
+    desc:['Мосты остаются позади, и шум водопадов тает, как последняя нота песни. Долина светится в утренней дымке — такой ты будешь вспоминать её ещё долго, в местах, где вспомнить будет больше нечего.',
+    'Впереди пустоши и дым, а над ними слышится далёкий глухой гул, будто мир в чём-то усомнился.'],
+    specials:[{id:'look_back',label:'Оглянуться',once:true,run:()=>{gainXp(2);addLog('Ты оборачиваешься в последний раз и запоминаешь всё: золото листвы, белые арки, голос воды. Пригодится в местах, где память будет единственным светом.','story');}}],
+    leaveLabel:'Идти на юг',onLeave:()=>addLog('Дикие земли встречают тебя ветром и тишиной.','story')},
+  {id:'south_road',name:'Южная дорога',art:'south_road',act:2,
+    desc:['Ривенделл исчезает за поворотом, и мир сразу становится шире, суше и беднее красками. Дорога тянется по голым пустошам, где ветер перебирает жёсткую траву, а стоячие камни торчат, как забытые зубы древней челюсти.',
+    'На юге поднимается столб тёмного дыма: не от костра и не от пожара, а ровный, упрямый, рукотворный. Вороны тянутся к нему по небу, словно к незримому пиру.',
+    'Мир здесь жёстче. Никто не спрашивает, откуда ты и куда, — просто смотрят, есть ли у тебя что взять.'],
+    specials:[{id:'forage_s',label:'Искать съедобное',once:true,run:()=>{if(roll(20)+state.player.luck>=11){state.player.inventory.food+=1;gainXp(3);addLog('У брошенной повозки на обочине рассыпаны яблоки, ещё не успевшие сгнить. Хозяина нигде не видно, и ты стараешься не думать почему.','good');}else addLog('Пусто.','info');}}],
+    leaveLabel:'К Изенгарду',onLeave:()=>addLog('На горизонте вырастает чёрная башня — тёмный палец, указывающий в небо.','story')},
+  {id:'isengard',name:'Окрестности Изенгарда',art:'isengard',act:2,
+    desc:['Круг Изенгарда лежит в долине, как чёрная язва на теле земли. Некогда здесь шумели рощи; теперь торчат одни пни, а между ними зияют ямы, из которых бьёт багровый огонь и тянется дым, чтобы пачкать небо. Стук топоров не смолкает ни днём, ни ночью.',
+    'Посреди кольца стен стоит Ортханк — башня из чёрного камня, гладкого, как стекло, и острого, как нож. Говорят, её не построили, а вырастили из самой земли. На вершине горит свет, не похожий ни на свет звезды, ни на свет очага.',
+    'По дорогам внутри кольца идут урук-хай — широкоплечие, угрюмые, с факелами и белой ладонью на шлемах. Здесь нужно быть либо очень осторожным, либо очень глупым.'],
+    specials:[
+      {id:'scout_isen',label:'Подкрасться ближе',once:true,run:()=>{const b=state.player.trait==='careful'?3:0;if(roll(20)+state.player.luck+b>=14){gainXp(7);addLog('Ты ползёшь по канаве вдоль стены и видишь то, о чём в Шире только шепчутся: урук-хай куют, рубят, ведут пленных. Потом тихо отступаешь, унося в памяти больше, чем хотел бы.','story');state.flags.sawIsengard=true;state.player.courage+=1;markKey('Видел Изенгард');}else{addLog('Урук-хай!','bad');startCombat('uruk');}}},
+      {id:'avoid_isen',label:'Обойти',once:true,run:()=>{gainXp(3);addLog('Ты обходишь долину широкой дугой по болотистым тропам, где дым остаётся лишь пятном на небе. Дольше, но спокойнее.','info');state.flags.avoidedIsengard=true;}}
+    ],leaveLabel:'К Фангорну',onLeave:()=>addLog('Впереди стена древних стволов. Лес смотрит.','story')},
+  {id:'fangorn',name:'Лес Фангорн',art:'fangorn',act:2,
+    desc:['Лес Фангорн не шумит — он думает. Деревья здесь так стары, что кора их похожа на лица, а ветви на раскинутые руки, застывшие на полужесте. Свет сочится зелёный и густой, как вода на дне колодца, и в нём медленно плывут пылинки времени.',
+    'Тебе чудится, что лес поворачивается вслед за тобой. Что корни переступают, когда ты отводишь глаза. Что где-то высоко, в плотной листве, кто-то очень медленно и очень внимательно вспоминает твоё имя.',
+    'Здесь можно отдохнуть и поесть: лес щедр к тем, кто не рубит. Но тем, кто рубит, он помнит.'],
+    specials:[
+      {id:'call_ent',label:'Позвать / ждать',once:true,run:()=>startScene('ent_meeting')},
+      {id:'rest_fang',label:'Отдохнуть у корней',once:true,run:()=>{state.player.stamina=clamp(state.player.stamina+10,0,state.player.maxStamina);state.player.hp=clamp(state.player.hp+6,0,state.player.maxHp);state.player.inventory.food+=1;gainXp(4);addLog('Ты отдыхаешь у корней, и древние деревья вокруг будто затаили дыхание, чтобы не потревожить тебя. Лес оставляет у твоих ног горсть диких плодов.','good');}}
+    ],leaveLabel:'К Рохану',onLeave:()=>addLog('Лес остаётся позади, и ты вдруг слышишь ржание, далёкое и вольное.','story')},
+  {id:'rohan',name:'Земли Рохана',art:'rohan',act:2,
+    desc:['Из-под тени деревьев ты выходишь на простор, и дыхание перехватывает. Трава катится до самого неба золотыми волнами, ветер гонит по ней светлые полосы, как рука гладит шерсть огромного зверя. На западе голубеют Белые горы, увенчанные вечным снегом.',
+    'На зелёном холме стоит Эдорас, а над ним — Золотой чертог, чья крыша сверкает так, что видно издали. Над стенами трепещут зелёные знамёна с белым конём. Земля пахнет сеном, конским потом и далёкой грозой.',
+    'Здесь живут люди, привыкшие к седлу и копью. Они гостеприимны к честным и безжалостны к тем, кто нечестен.'],
+    specials:[
+      {id:'edoras',label:'Искать всадников',once:true,run:()=>startScene('rohan_riders')},
+      {id:'pipe',label:'Трубочное зелье',once:true,run:()=>{if(state.player.inventory.pipeweed>0){state.player.inventory.pipeweed--;state.player.stamina=clamp(state.player.stamina+4,0,state.player.maxStamina);gainXp(2);addLog('Ты набиваешь трубку и затягиваешься. Дым стелется по ветру над полями Рохана, пахнет Широм, и на минуту в груди теплеет, как у печи.','good');}else{state.player.inventory.pipeweed=1;state.player.inventory.food+=1;addLog('Бродячий торговец, ни о чём не спрашивая, меняет тебе хлеб и щепоть доброго зелья на улыбку. «Ты не из тех, кого я встречал», — говорит он.','info');}}}
+    ],leaveLabel:'К Гондору',onLeave:()=>{state.player.inventory.food+=1;addLog('Всадник передаёт тебе паёк и коротко кивает: в его краях этим всё сказано.','story');}},
+  {id:'pelennor',name:'Поля Пеленнора',art:'pelennor',act:2,
+    desc:['Когда-то эти поля колосились. Теперь над ними висит дым, а рассвет красен не от зари. Земля изрыта и истоптана; обломки осадных башен торчат из неё, как кости неведомых зверей, а над ними тлеют знамёна — чёрные, красные, изорванные.',
+    'Вдали, на фоне тёмных гор, белеет Город — высокий, гордый, одинокий. А ближе шевелятся громады: исполины с башнями на спинах, чей топот ты слышишь ступнями прежде, чем увидишь их.',
+    'Хоббит среди такой битвы — крошка, пылинка. Но порой именно пылинка замечает то, чего не видят великие.'],
+    specials:[
+      {id:'help_battle',label:'Помочь раненым',once:true,run:()=>{state.flags.helpedPelennor=true;state.flags.kindness=(state.flags.kindness||0)+1;state.player.courage+=1;if(state.player.inventory.herbs>0)state.player.inventory.herbs--;state.player.inventory.food+=1;gainXp(6);addLog('Ты перевязываешь раненого лоскутом плаща, подаёшь воды другому, держишь за руку третьего, пока тот не перестаёт бояться. Кто-то суёт тебе сухарь: «Ешь, малый. Ты заслужил».','good');markKey('Помог на Пеленноре');}},
+      {id:'hide_p',label:'Держаться в тени',once:true,run:()=>{gainXp(2);addLog('Ты пригибаешься и идёшь вдоль развалин, где тень гуще. Совесть шепчет, но ты шепчешь в ответ: главное — дойти.','info');}}
+    ],leaveLabel:'К Минас Тириту',onLeave:()=>addLog('Белые стены растут перед тобой, и ты уже различаешь стражу на башнях.','story')},
+  {id:'minas_tirith',name:'Минас Тирит',art:'minas_tirith',act:2,
+    desc:['Минас Тирит поднимается из горы семью кругами, как корабль, вставший носом на волну. Каждая стена белее предыдущей, и на закате весь город горит розовым и золотым, словно изваянный из света. Над последним кругом возносится Белая башня — тонкая, как лезвие, и такая высокая, что в ней, кажется, живёт ветер.',
+    'Ворота Города — из стали и чёрного дерева; стража в серебряных шлемах смотрит на тебя без насмешки, но и без надежды. Здесь все знают, что мир стоит на краю, и все ведут себя так, будто завтра ещё будет.',
+    'Можно поесть, отдохнуть и спросить совета у тех, кто привык отвечать на вопросы, которых лучше не задавать.'],
+    specials:[
+      {id:'steward',label:'Искать совет',once:true,run:()=>startScene('minas_council')},
+      {id:'rest_mt',label:'Отдохнуть за стенами',once:true,run:()=>{state.player.hp=clamp(state.player.hp+12,0,state.player.maxHp);state.player.stamina=clamp(state.player.stamina+10,0,state.player.maxStamina);state.player.hunger=clamp(state.player.hunger-15,0,state.player.maxHunger);state.player.inventory.food+=1;gainXp(4);addLog('За белыми стенами тихо, как в храме. Тебе дают воды и хлеба, укладывают в тёплой комнате, и ты засыпаешь под далёкий звон колоколов.','good');}}
+    ],leaveLabel:'К Мордору',onLeave:()=>{state.player.inventory.food+=1;state.player.inventory.elvenBread+=1;addLog('У ворот тебе вручают дорожный паёк и тонкую лепёшку лембаса. «Идти туда — безумие, — говорит старый стражник. — Но безумие иногда единственное, что остаётся».','story');}},
+  {id:'mordor_road',name:'Подступы к Мордору',art:'mordor_road',act:2,
+    desc:['Земля почернела и потрескалась, как обожжённый горшок. Воздух густ от пепла, и каждый вдох оставляет во рту вкус железа и золы. Небо над головой — не небо, а багровый свод, где, медленно ворочаясь, клубятся тучи, подсвеченные снизу.',
+    'Далеко впереди над хребтами стоит Барад-дур — башня, чья тень длиннее дороги, а на вершине её, в трещине между чёрных зубцов, открыт огромный огненный Глаз. Он ничего не говорит. Он просто смотрит.',
+    'Если у тебя есть Кольцо, оно шепчет — всё громче, всё ласковее. Здесь оно дома, и оно это знает.'],
+    specials:[
+      {id:'hide_m',label:'Ползать / прятаться',once:true,run:()=>{const b=state.player.trait==='careful'?4:0;if(roll(20)+state.player.luck+b>=12){gainXp(5);addLog('Ты ползёшь по золе, замирая, когда над головой проходят патрули. Пепел забивается в ноздри, но тебя не замечают.','good');state.flags.sneakedMordor=true;}else{addLog('Орки!','bad');startCombat('orc');}}},
+      {id:'ring_tempt',label:'Кольцо зовёт',once:true,run:()=>{if(state.player.hasRing||state.player.inventory.ring>0)startScene('ring_temptation');else addLog('Только ветер и пепел. Никакого шёпота: тебе нечего нести, и тьме нечего просить.','info');}}
+    ],leaveLabel:'К Ородруину',onLeave:()=>{
+      if((state.player.hasRing||state.player.inventory.ring>0)&&!state.flags.ringTemptDone&&chance(.5)){state.flags.ringTemptDone=true;startScene('ring_temptation');return;}
+      addLog('Над чёрными скалами встаёт Роковая Гора. Она дымится, как больной зверь, и ты идёшь к ней, потому что больше идти некуда.','story');
+    }},
+  {id:'orodruin',name:'Ородруин — Роковая Гора',art:'orodrui',act:2,
+    desc:['Роковая Гора дышит. Ты чувствуешь её дыхание кожей: жар давит, как ладонь на затылок. Из трещин текут огненные реки, камень стонет и содрогается под ногами. Небо над горой чёрно, как внутренность печи, и лишь искры, взлетая, на миг ложатся на него золотой россыпью.',
+    'Здесь кончаются дороги и начинаются решения. Всё, что было прежде — холмы, огни, песни, чужие руки, — лежит позади, как сон. Остались только ты, край жерла и то, что ты принёс. Или не принёс.'],
+    specials:[{id:'final_choice',label:'Подойти к краю жерла',once:true,run:()=>startScene('mount_doom')}],
+    leaveLabel:'Завершить путь',onLeave:()=>{if(!state.flags.destroyedRing&&!state.flags.keptRing&&!state.flags.noRingEnd)startScene('mount_doom');}}
+];
+
+function getLocations(){return state.act===2?LOC_ACT2:LOC_ACT1;}
+function getPathNames(){return state.act===2?PATH_ACT2:PATH_ACT1;}
+function canEatHere(){const loc=getLocations()[state.locationIndex];return loc&&EAT_LOCS.has(loc.id);}
+
+const SCENES={
+  prologue:{title:'Рассвет в Хоббитоне',steps:[{text:()=>[
+    'Осень в Шире пахнет яблоками и дымом, и тебе всегда казалось, что этого довольно для целой жизни.',
+    'Но в последние дни что-то изменилось. Купцы с востока говорят вполголоса и не поднимают глаз. Ночью, когда гаснут лампы, слышно, как далеко за холмами ходит ветер — не здешний, не наш — и шепчет о вещах, которым не место в круглых норах.',
+    'Сегодня на рассвете, '+state.player.name+', ты проснулся с чувством, что тебя позвали по имени. Тихо, без слов, как зовут того, кто давно опоздал. Ты собрал котомку, ещё не решив, зачем. Дверь открыта. Утро ждёт.'
+  ],choices:[{label:'Выйти за порог',run:()=>{addLog('Ты выходишь на крыльцо. Роса холодит босые ноги, и первый шаг оказывается самым трудным.','story');gainXp(2);}}]}]},
+  find_ring:{title:'Блеск у тропы',steps:[{text:['У самого края тропы, в мокрой траве, что-то тускло блеснуло. Не так, как блестит роса или осколок слюды: глубже и тяжелее, будто свет внутри не хотел показываться.',
+    'Это золотой ободок без камня и узора. Ты поднимаешь взгляд: вокруг тихо, ни птиц, ни ветра. Только странное чувство, будто маленькая вещь заметила тебя первой.',
+    'Можно взять её. Можно сделать вид, что ты ничего не увидел, — и, быть может, так будет мудрее.'],choices:[
+    {label:'Поднять Кольцо',run:()=>{
+      state.player.inventory.ring=1;state.player.hasRing=true;state.flags.ringFound=true;
+      state.stats.ringsFound=(state.stats.ringsFound||0)+1;gainXp(6);
+      addLog('Золотое кольцо в ладони. Тяжелее, чем кажется.','story');
+      addThought('Зачем оно здесь?');markKey('Нашёл Кольцо');
+    }},
+    {label:'Оставить / пройти мимо',run:()=>{
+      state.flags.leftRingOnRoad=true;gainXp(2);
+      addLog('Ты отводишь взгляд. Блеск остаётся позади.','info');
+      markKey('Оставил Кольцо на дороге');
+    }}
+  ]}]},
+  stranger_grey:{title:'Человек в сером',steps:[{text:['Человек в сером поднимает глаза, и ты видишь, что они не по возрасту ясные и не по-доброму усталые. Он смотрит долго, словно читает, а ты — книга, которую ему уже случалось держать в руках.',
+    '«Хоббит, — говорит он негромко. — Далеко же ты забрался от своих нор. Куда держишь путь?»'],choices:[
+    {label:'«В Ривенделл»',run:()=>{state.flags.toldTruthToGrey=true;state.player.courage+=1;gainXp(5);addLog('«Смелый шаг».','story');markKey('Сказал правду Серому');}},
+    {label:'Соврать',run:()=>{state.flags.liedToGrey=true;gainXp(2);addLog('«Как скажешь».','info');}},
+    {label:'Отойти',run:()=>addLog('Отступаешь.','info')}
+  ]}]},
+  wounded_man:{title:'Раненый',steps:[{text:['За кустом, в сырой листве, лежит человек. Плащ его изорван, грудь тяжело вздымается, а у пояса — тёмное пятно, уже подсохшее по краям. Он видит тебя и хрипит, не поднимая головы:',
+    '«Воды… или уходи. Если тот, кто шёл за мной, найдёт нас обоих, будет хуже».'],choices:[
+    {label:'Помочь',run:()=>{if(state.player.inventory.herbs>0)state.player.inventory.herbs--;state.player.stamina=clamp(state.player.stamina-3,0,state.player.maxStamina);state.flags.helpedWounded=true;state.flags.kindness=(state.flags.kindness||0)+2;gainXp(8);addLog('«Аратан. Скажи в Ривенделле».','good');markKey('Помог раненому');}},
+    {label:'Забрать вещи',run:()=>{state.player.inventory.food+=1;state.flags.robbedWounded=true;state.flags.kindness=(state.flags.kindness||0)-2;state.player.courage=clamp(state.player.courage-1,1,20);gainXp(2);addLog('Еда есть. На душе тяжело.','bad');markKey('Обобрал раненого');}},
+    {label:'Уйти',run:()=>{state.flags.leftWounded=true;addLog('Уходишь.','info');}}
+  ]}]},
+  troll_scene:{title:'У камней',steps:[{text:['Вблизи каменные фигуры ещё огромнее. Мох лёг на плечи, птичье гнездо — на лысую макушку. Но странно: в щели между пальцами ближнего исполина, там, где камень должен быть холоден, вьётся тонкая струйка пара.',
+    'Камень дрожит. Тихо, едва заметно, будто кто-то в нём очень не хочет просыпаться — и всё же просыпается.'],choices:[
+    {label:'Схватить и бежать',run:()=>{state.player.inventory.food+=1;gainXp(2);addLog('Кусок вяленого с собой.','info');}},
+    {label:'Обмануть',run:()=>{if(roll(20)+state.player.luck+(state.player.trait==='curious'?2:0)>=12){state.player.inventory.elvenBread+=1;state.flags.outsmartedTroll=true;gainXp(10);addLog('Лембас. Тролль затих.','good');markKey('Обхитрил тролля');}else{addLog('Оживает!','bad');startCombat('troll');}}},
+    {label:'Атаковать',run:()=>{startCombat('troll');}}
+  ]}]},
+  cave_exit:{title:'Выход из пещер',steps:[{text:['Трещина расширяется, и вдруг — свет. Серый, неяркий, но настоящий, как первый глоток воды после долгой жажды. Ты выползаешь из горы, и холодный ветер бьёт в лицо, пахнущий снегом и соснами.',
+    'Гоблинские напевы остались внизу, в темноте. Руки дрожат, колени не держат. Но ты жив, и это сейчас значит больше любого сокровища.'],choices:[
+    {label:'Сесть и дышать',run:()=>{state.player.stamina=clamp(state.player.stamina+5,0,state.player.maxStamina);gainXp(5);addLog('Жив.','story');state.flags.watchedDawn=true;}},
+    {label:'Сразу дальше',run:()=>{gainXp(3);addLog('К зелени.','info');}}
+  ]}]},
+  elf_help:{title:'Эльфийский следопыт',steps:[{text:['Из тени берёзы выходит высокий тонкий силуэт, и ты не сразу понимаешь, что слышал не шаги, а лишь шорох собственных мыслей. Эльф смотрит на тебя без удивления, как смотрят на тех, чьё появление давно отмечено в звёздах.',
+    '«Хоббит, — говорит он мягко. — Ты устал и далеко от дома. Чего ищешь ты на этой тропе?»'],choices:[
+    {label:'Просить помощи',run:()=>{state.flags.metElf=true;state.player.inventory.elvenBread+=2;state.player.inventory.food+=1;state.player.hp=clamp(state.player.hp+10,0,state.player.maxHp);gainXp(8);addLog('Лембас, паёк, тропа.','good');}},
+    {label:'Отказаться',run:()=>{state.flags.metElf=true;state.player.courage+=1;gainXp(5);addLog('«Путь твой».','story');}}
+  ]}]},
+  rider_approach:{title:'Чёрный Всадник',steps:[{text:['Холод приходит раньше звука. Трава перед тобой седеет, как от инея, а в воздухе стоит запах сырой земли и старого железа. Затем — стук копыт: медленный, ровный, настойчивый.',
+    'На тропе, в чёрном плаще, у которого нет ни складок, ни лица под капюшоном, возникает всадник. Конь его фыркает, но не паром, а тьмой. Он ищет. И он уже знает, что здесь есть что искать.'],choices:[
+    {label:'Затаиться',run:()=>{let b=state.player.trait==='careful'?.2:0;if(state.flags.woreRing)b-=.25;if(chance(.55+b)){gainXp(6);addLog('Проезжает мимо.','good');state.flags.hidFromRider=true;}else{addLog('Нашёл.','bad');startCombat('rider');}}},
+    {label:'Бежать',run:()=>{state.player.stamina=clamp(state.player.stamina-5,0,state.player.maxStamina);if(chance(.4+state.player.luck*.02)){gainXp(4);addLog('Спасся.','good');}else{addLog('Настиг.','bad');startCombat('rider');}}},
+    {label:'Надеть Кольцо',requireRing:true,run:()=>{state.flags.woreRing=true;state.flags.woreRingCount=(state.flags.woreRingCount||0)+1;gainXp(3);addLog('Мир серый. Всадник уходит.','story');state.player.courage=clamp(state.player.courage-1,1,20);markKey('Надевал Кольцо');}},
+    {label:'Смотреть',run:()=>{startCombat('rider');}}
+  ]}]},
+  ring_whisper:{title:'Шёпот',steps:[{text:['Среди ночи ты просыпаешься не от звука, а от его отсутствия. Кольцо в котомке стало тяжёлым, как камень, и тёплым, как живая ладонь. Из него, тоньше паутины, поднимается голос — ласковый, без злобы, даже заботливый.',
+    '«Ты устал, — шепчет он. — Позволь мне нести тебя».'],choices:[
+    {label:'Спрятать',run:()=>{gainXp(4);addLog('Голос затихает.','info');state.flags.resistedRing=true;}},
+    {label:'Прислушаться',run:()=>{state.flags.listenedToRing=true;state.flags.woreRingCount=(state.flags.woreRingCount||0)+1;addLog('Обещает силу.','story');}}
+  ]}]},
+  rivendell_council:{title:'Совет в Ривенделле',steps:[{text:['Элронд принимает тебя на террасе, где ветер приносит с водопадов водяную пыль и песню. Лицо его не стареет и не молодеет — оно просто помнит. Взгляд проходит сквозь тебя, как луч сквозь стекло, и видит дальше, чем ты сам.',
+    '«Ты прошёл долгий путь, — говорит он. — Дальше дорога труднее, и никакой совет не заменит выбора. Чего ты желаешь теперь?»'],choices:[
+    {label:'«Пойду на юг.»',run:()=>{state.flags.councilDone=true;state.flags.choseSouth=true;state.player.courage+=2;gainXp(10);addLog('«Дадим всё, что можем».','story');markKey('Выбрал путь на юг');}},
+    {label:'«Хочу остаться.»',run:()=>{state.flags.councilDone=true;state.flags.choseStay=true;gainXp(5);addLog('«Отдых — тоже мудрость».','info');markKey('Остался в Ривенделле');finishGame('stay');}}
+  ]}]},
+  ent_meeting:{title:'Энт',steps:[{text:['Из полумрака проступает фигура, которую ты принял за дерево, пока она не двинулась. Лицо её — в складках коры, глаза — два колодца, на дне которых плавают золотистые искры. Голос рокочет медленно, как оползень, и каждое слово он выговаривает так, словно пробует на вкус.',
+    '«Хм… хоо… Малый, — тянет он. — Ты пахнешь дорогой и дымом. Скажи мне: ты за лес или за башню?»'],choices:[
+    {label:'«За лес.»',run:()=>{state.flags.metEnt=true;state.flags.entFriend=true;state.flags.kindness=(state.flags.kindness||0)+1;state.player.inventory.herbs+=2;state.player.inventory.food+=1;state.player.hp=clamp(state.player.hp+8,0,state.player.maxHp);gainXp(8);addLog('Вода, травы, плоды.','good');markKey('Друг энтов');}},
+    {label:'«Прохожу.»',run:()=>{state.flags.metEnt=true;gainXp(3);addLog('«Не руби».','info');}},
+    {label:'Уйти',run:()=>{addLog('Лес провожает.','info');}}
+  ]}]},
+  rohan_riders:{title:'Всадники Рохана',steps:[{text:['Земля гремит ещё до того, как ты видишь всадников. Они вылетают из-за гребня холма, словно сорвавшаяся грозовая туча: гривы вьются, копья блестят, зелёные плащи рвутся на ветру. Круг сжимается, и острия смотрят тебе прямо в грудь.',
+    '«Кто ты, малый путник? — спрашивает старший, не опуская копья. — Шпион Изенгарда или просто заблудившийся бродяга?»'],choices:[
+    {label:'Правда о пути',run:()=>{state.flags.metRohan=true;state.flags.rohanFriend=true;state.player.inventory.food+=2;gainXp(7);addLog('«Ешь. Храбро».','good');markKey('Друг Рохана');}},
+    {label:'Уклониться',run:()=>{state.flags.metRohan=true;gainXp(2);addLog('«Ступай».','info');}},
+    {label:'Просить помощи',run:()=>{state.flags.metRohan=true;state.player.stamina=clamp(state.player.stamina+6,0,state.player.maxStamina);state.player.inventory.food+=1;gainXp(5);addLog('Провожают и кормят.','good');}}
+  ]}]},
+  minas_council:{title:'В Минас Тирите',steps:[{text:['В высоком каменном зале, под сводами, где эхо шагов вьётся, как птица, сидит старый человек в тёмных одеждах. Лицо его отмечено усталостью и властью поровну. Рядом стоят воины в серебре, и никто не шевелится, пока он молчит.',
+    '«Чего ищешь ты у стен Белого Города, невеликий странник?» — спрашивает он наконец.'],choices:[
+    {label:'«Путь в Мордор.»',run:()=>{state.flags.minasSupport=true;state.player.courage+=2;state.player.inventory.food+=2;state.player.inventory.herbs+=1;if(state.player.inventory.sword<1){state.player.inventory.sword=1;state.player.weapon=Math.max(state.player.weapon,2);}gainXp(10);addLog('«Безумие. И шанс».','story');markKey('Поддержка Гондора');}},
+    {label:'«Только отдых.»',run:()=>{state.flags.minasPassed=true;state.player.inventory.food+=1;gainXp(4);addLog('«Ворота на восток открыты».','info');}}
+  ]}]},
+  ring_temptation:{title:'Искушение Кольца',steps:[{text:['Земля под ногами тепла, воздух густ, и голос в твоём кармане больше не шепчет — он поёт. В нём сила, и усталость, и обещание, что всё это можно прекратить одним лёгким движением.',
+    '«Надень, — звучит он. — Ты станешь выше гор. Ты станешь властелином. Никто больше не посмеет пройти мимо тебя».'],choices:[
+    {label:'Сопротивляться',run:()=>{state.flags.resistedRing=true;state.flags.resistedInMordor=true;state.player.courage+=2;gainXp(12);addLog('Не надеваешь.','story');markKey('Сопротивлялся в Мордоре');}},
+    {label:'Надеть ненадолго',run:()=>{state.flags.woreRing=true;state.flags.woreRingCount=(state.flags.woreRingCount||0)+1;state.flags.woreInMordor=true;gainXp(3);addLog('Патруль мимо. Глаз повернулся.','bad');state.player.courage=clamp(state.player.courage-2,1,20);markKey('Надевал в Мордоре');}},
+    {label:'Хотеть оставить',run:()=>{state.flags.claimedRing=true;state.flags.woreRingCount=(state.flags.woreRingCount||0)+2;addLog('Прячешь глубже.','story');}}
+  ]}]},
+  mount_doom:{title:'У края Ородруина',steps:[{text:['Роковая Гора стонет, и под ногами пляшут красные отблески. Лава внизу течёт медленно и густо, как кровь старого зверя. Жар такой, что слезятся глаза, а воздух над краем дрожит, как над раскалённым железом.',
+    'Если Кольцо с тобой, оно жжёт ладонь, словно знает, где оказалось. Теперь всё зависит от одной руки, одной мысли и одного мгновения.'],choices:[
+    {label:'Уничтожить Кольцо',requireRing:true,run:()=>{state.flags.destroyedRing=true;gainXp(20);addLog('Золото в огонь. Тишина.','story');finishGame('destroyed');}},
+    {label:'Не бросать',requireRing:true,run:()=>{state.flags.keptRing=true;addLog('Пальцы не слушаются.','bad');finishGame('kept');}},
+    {label:'Стоять у края (нет Кольца)',requireNoRing:true,run:()=>{
+      state.flags.noRingEnd=true;
+      addLog('Так... какое ещё кольцо? Нету никакого кольца у меня! Зря шёл..','story');
+      addThought('Может, оно осталось в траве. Может, его и не было.');
+      finishGame('no_ring_end');
+    }}
+  ]}]}
+};
+
+let state=null;
+function newGameState(){
+  return{screen:'title',player:null,act:1,locationIndex:0,time:'day',day:1,weather:'clear',log:[],
+    stats:{battlesWon:0,battlesFled:0,foodEaten:0,maxHunger:0,stepsTaken:0,eventsSeen:0,ringsFound:0,damageDealt:0,damageTaken:0},
+    usedActions:{},flags:{},keyChoices:[],combat:null,pendingLevelUp:false,ending:null,scene:null,sceneStep:0,snapshot:null};
+}
+function newPlayer(name,trait){
+  const t=TRAITS[trait]||TRAITS.curious;
+  const p={name:name||'Хоббит',trait,level:1,xp:0,xpNext:16,hp:30,maxHp:30,stamina:20,maxStamina:20,hunger:0,maxHunger:100,
+    courage:5+(t.bonuses.courage||0),luck:5+(t.bonuses.luck||0),weapon:1,armor:0,hasRing:false,
+    inventory:{food:3,herbs:1,torch:0,elvenBread:0,armor:0,ring:0,pipeweed:0,sword:0}};
+  if(t.startFood)p.inventory.food=Math.max(1,p.inventory.food+t.startFood);
+  return p;
+}
+function saveGame(){if(!state||state.screen==='end')return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(e){}}
+function loadGame(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return false;const d=JSON.parse(r);if(!d||!d.player)return false;state=d;if(!state.keyChoices)state.keyChoices=[];return true;}catch(e){return false;}}
+function hasSave(){try{return!!localStorage.getItem(SAVE_KEY);}catch(e){return false;}}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+function addLog(t,type='info'){state.log.push({text:t,type});if(state.log.length>90)state.log.shift();}
+function addThought(t){state.log.push({text:'💭 '+t,type:'thought'});if(state.log.length>90)state.log.shift();}
+function markKey(label){if(!state.keyChoices)state.keyChoices=[];if(!state.keyChoices.includes(label))state.keyChoices.push(label);}
+
+function gainXp(n){if(!state.player||!n)return;state.player.xp+=n;addLog('+'+n+' опыта.','info');checkLevelUp();}
+function checkLevelUp(){
+  const p=state.player;
+  while(p.xp>=p.xpNext&&p.level<12){
+    p.xp-=p.xpNext;p.level++;p.xpNext=Math.round(14+p.level*7);
+    p.maxHp+=5;p.hp=Math.min(p.maxHp,p.hp+5);p.maxStamina+=2;p.stamina=Math.min(p.maxStamina,p.stamina+2);p.courage+=1;
+    state.pendingLevelUp=(state.pendingLevelUp|0)+1;addLog('Уровень '+p.level+'!','story');
+  }
+}
+function applyLevelUpChoice(c){
+  const p=state.player;
+  if(c==='hp'){p.maxHp+=3;p.hp+=3;addLog('+3 HP.','good');}
+  else if(c==='stamina'){p.maxStamina+=2;p.stamina+=2;addLog('+2 выносливости.','good');}
+  else if(c==='luck'){p.luck+=1;addLog('+1 удачи.','good');}
+  else if(c==='weapon'){p.weapon+=1;addLog('+1 урона.','good');}
+  state.pendingLevelUp=Math.max(0,(state.pendingLevelUp|0)-1);render();saveGame();
+}
+function summarizeAct1(){
+  ['— Итог до Ривенделла —',
+    state.flags.helpedWounded?'Помог раненому.':null,
+    state.flags.leftRingOnRoad?'Оставил Кольцо на дороге.':null,
+    state.flags.ringFound?'Несёт Кольцо.':null,
+    'Уровень '+state.player.level+'.'
+  ].filter(Boolean).forEach(l=>addLog(l,'story'));
+}
+function advanceTime(){
+  const o=['day','evening','night'];const i=o.indexOf(state.time);
+  if(i===2){state.time='day';state.day++;}else state.time=o[i+1];
+  if(chance(.35))state.weather=pick(['clear','cloudy','rain','fog','storm']);
+  if(state.time==='night'&&chance(.18)){
+    if((state.player.hasRing||state.player.inventory.ring>0)&&chance(.4))startScene('ring_whisper');
+    else if(chance(.25)){addLog('Странные звуки ночью.','info');state.player.stamina=clamp(state.player.stamina-2,0,state.player.maxStamina);}
+  }
+}
+function applyHunger(){
+  const p=state.player;state.stats.maxHunger=Math.max(state.stats.maxHunger,p.hunger);
+  const r=p.trait==='stubborn'?.5:1;
+  if(p.hunger>=90){const d=Math.ceil(3*r);p.hp-=d;addLog('Голод: −'+d+' HP.','bad');}
+  else if(p.hunger>=70){const d=Math.ceil(1*r);p.hp-=d;addLog('Голод: −'+d+' HP.','bad');}
+  if(p.hp<=0){p.hp=0;onPlayerDeath('hunger');}
+}
+function getConditionText(){
+  const p=state.player;
+  if(p.hp/p.maxHp<.3||p.hunger>=80)return{t:'На пределе.',cls:'bad'};
+  if(p.hunger>=55||p.stamina/p.maxStamina<.35)return{t:'Устал и голоден.',cls:'warn'};
+  if(state.act===2)return{t:'Юг жёстче севера.',cls:''};
+  return{t:'Держишься.',cls:''};
+}
+function takeSnapshot(){
+  try{
+    state.snapshot={
+      act:state.act,locationIndex:Math.max(0,state.locationIndex-3),
+      player:JSON.parse(JSON.stringify(state.player)),
+      flags:JSON.parse(JSON.stringify(state.flags)),
+      usedActions:JSON.parse(JSON.stringify(state.usedActions)),
+      time:state.time,day:state.day,weather:state.weather,
+      keyChoices:(state.keyChoices||[]).slice(),
+      stats:JSON.parse(JSON.stringify(state.stats))
+    };
+  }catch(e){state.snapshot=null;}
+}
+function onPlayerDeath(reason){state.combat=null;state.scene=null;state.screen='death';state.deathReason=reason||'combat';render();}
+function deathRestart(){state=newGameState();state.screen='char';render();}
+function deathRewind(){
+  if(!state.snapshot){deathRestart();return;}
+  const s=state.snapshot;
+  state.act=s.act;state.locationIndex=s.locationIndex;state.player=s.player;
+  state.player.hp=Math.max(8,Math.floor(state.player.maxHp*0.55));
+  state.player.stamina=Math.max(5,Math.floor(state.player.maxStamina*0.5));
+  state.player.hunger=Math.min(state.player.hunger,50);
+  if(state.player.inventory.food<2)state.player.inventory.food=2;
+  state.flags=s.flags;state.usedActions=s.usedActions;
+  state.time=s.time;state.day=s.day;state.weather=s.weather;
+  state.keyChoices=s.keyChoices||[];state.stats=s.stats;
+  state.combat=null;state.scene=null;state.pendingLevelUp=false;state.screen='game';
+  addLog('Тьма отступает… Ты приходишь в себя раньше на дороге.','story');
+  render();saveGame();
+}
+
+function doSearch(){
+  const loc=getLocations()[state.locationIndex];
+  state.usedActions[loc.id+'_search']=true;
+  state.player.stamina=clamp(state.player.stamina-2,0,state.player.maxStamina);
+  state.player.hunger=clamp(state.player.hunger+3+(state.act===2?2:0),0,state.player.maxHunger);
+  const b=state.player.trait==='curious'?3:0;
+  const r=roll(20)+Math.floor(state.player.luck/2)+b;
+  if(r>=15){const f=pick(['food','food','herbs','torch']);state.player.inventory[f]=(state.player.inventory[f]||0)+1;gainXp(4);addLog('Находка: '+ITEMS[f].name+'.','good');}
+  else if(r>=10){gainXp(2);addLog('Ничего ценного.','info');}
+  else if(r>=5){gainXp(1);addLog('Пусто.','info');}
+  else{addLog('Кто-то рядом...','bad');if(chance(.5))triggerEvent(true);else{startCombat(pick(state.act===2?['orc','warg']:['wolf','bandit','goblin']));return;}}
+  applyHunger();if(state.player.hp<=0)return;render();saveGame();
+}
+function doRest(){
+  const p=state.player;let rest=state.act===2?5:8;if(p.trait==='stubborn')rest=Math.max(4,rest-2);
+  p.stamina=clamp(p.stamina+rest,0,p.maxStamina);p.hunger=clamp(p.hunger+6+(state.act===2?4:0),0,p.maxHunger);
+  advanceTime();gainXp(1);addLog(state.act===2?'Тревожный отдых.':'Отдых.','info');
+  if(chance(.22+(state.act===2?.1:0)))triggerEvent();
+  applyHunger();if(state.player.hp<=0)return;render();saveGame();
+}
+function doEat(){
+  if(!canEatHere()){addLog('Здесь нельзя поесть — только в тавернах и приютах. В пути — лембас.','info');render();return;}
+  const p=state.player;if(p.inventory.food<=0){addLog('Нет еды.','bad');render();return;}
+  p.inventory.food--;p.hunger=clamp(p.hunger-22,0,p.maxHunger);p.hp=clamp(p.hp+6,0,p.maxHp);
+  state.stats.foodEaten++;gainXp(1);addLog('Перекус у огня.','good');render();saveGame();
+}
+function doLeave(){
+  takeSnapshot();
+  const locs=getLocations();const loc=locs[state.locationIndex];
+  const prevAct=state.act,prevIndex=state.locationIndex;
+  state.flags.leaveBlocked=false;
+  if(loc.onLeave)loc.onLeave();
+  if(state.screen==='scene'||state.screen==='combat'||state.screen==='end'||state.screen==='death')return;
+  if(state.flags.leaveBlocked){render();saveGame();return;}
+  if(state.act!==prevAct){gainXp(5);render();saveGame();return;}
+  if(state.locationIndex!==prevIndex){render();saveGame();return;}
+  if(state.locationIndex>=locs.length-1){
+    if(loc.id==='rivendell'){render();saveGame();return;}
+    if(loc.id==='orodruin'){if(!state.flags.destroyedRing&&!state.flags.keptRing&&!state.flags.noRingEnd)startScene('mount_doom');return;}
+    finishGame();return;
+  }
+  state.locationIndex++;state.stats.stepsTaken++;
+  state.player.stamina=clamp(state.player.stamina-4-(state.act===2?1:0),0,state.player.maxStamina);
+  state.player.hunger=clamp(state.player.hunger+7+(state.act===2?4:0),0,state.player.maxHunger);
+  gainXp(2);advanceTime();
+  if(state.act===1&&state.locationIndex===4&&!state.flags.riderMet&&chance(.35)){state.flags.riderMet=true;startScene('rider_approach');return;}
+  if(chance(.38))triggerEvent();
+  if(state.player.hp<=0)return;
+  if(state.screen==='combat'||state.screen==='scene'||state.screen==='death')return;
+  addLog('Прибытие: '+getLocations()[state.locationIndex].name+'.','story');
+  applyHunger();if(state.player.hp<=0)return;render();saveGame();
+}
+
+const EVENTS=[
+  {id:'food',w:11,run:()=>{const n=randInt(1,2);state.player.inventory.food+=n;gainXp(2);addLog('Припасы (+'+n+').','good');}},
+  {id:'herbs',w:7,run:()=>{state.player.inventory.herbs+=1;gainXp(2);addLog('Травы.','good');}},
+  {id:'wolf',w:5,run:()=>{addLog('Волк!','bad');startCombat('wolf');}},
+  {id:'bandit',w:4,run:()=>{addLog('Разбойник.','bad');startCombat('bandit');}},
+  {id:'goblin',w:4,run:()=>{addLog('Гоблины!','bad');startCombat('goblin');}},
+  {id:'orc',w:5,run:()=>{addLog('Орк!','bad');startCombat('orc');}},
+  {id:'uruk',w:3,run:()=>{addLog('Урук-хай!','bad');startCombat('uruk');}},
+  {id:'warg',w:3,run:()=>{addLog('Варг!','bad');startCombat('warg');}},
+  {id:'traveler',w:8,run:()=>{state.player.inventory.food+=1;state.player.courage+=1;gainXp(3);addLog('Путник делится едой.','good');}},
+  {id:'campfire',w:5,run:()=>{state.player.inventory.food+=1;gainXp(2);addLog('Хлеб у чужого костра.','info');}},
+  {id:'weather',w:5,run:()=>{state.weather=pick(['rain','storm','fog']);state.player.stamina=clamp(state.player.stamina-3,0,state.player.maxStamina);addLog('Погода: '+WEATHER[state.weather].name+'.','info');}},
+  {id:'lost',w:3,run:()=>{state.player.hunger=clamp(state.player.hunger+10,0,state.player.maxHunger);state.player.stamina=clamp(state.player.stamina-4,0,state.player.maxStamina);addLog('Сбились с пути.','bad');}},
+  {id:'ring',w:1,run:()=>{if(state.player.inventory.ring>0||state.flags.ringFound||state.flags.leftRingOnRoad){addLog('Странный холод.','info');return;}state.player.inventory.ring=1;state.player.hasRing=true;state.flags.ringFound=true;state.stats.ringsFound++;gainXp(6);addLog('Золотое кольцо под корнем.','story');markKey('Нашёл Кольцо');}},
+  {id:'rider_far',w:2,run:()=>{addLog('Вдалеке — чёрный всадник.','bad');state.player.courage=clamp(state.player.courage-1,1,20);}}
+];
+function triggerEvent(forceBad=false){
+  state.stats.eventsSeen++;
+  let pool=EVENTS;
+  if(forceBad)pool=EVENTS.filter(e=>['wolf','bandit','goblin','orc','uruk','warg','lost'].includes(e.id));
+  if(state.act===1)pool=pool.filter(e=>!['orc','uruk','warg'].includes(e.id));
+  const tot=pool.reduce((s,e)=>s+e.w,0);let r=Math.random()*tot;
+  for(const e of pool){r-=e.w;if(r<=0){e.run();return;}}
+  pool[0].run();
+}
+
+function playerPower(){const p=state.player;return p.level*2.5+p.weapon*2+p.armor*1.5+Math.floor(p.maxHp/12)+(p.inventory.sword>0?1.5:0);}
+function scaleEnemy(base){
+  const power=playerPower();
+  let scale=Math.min(2.1,Math.max(1.05,0.75+power/24));
+  if(base.name==='Орк'||base.name==='Варг')scale=Math.min(scale,1.35);
+  if(base.name==='Урук-хай')scale=Math.min(scale,1.55);
+  if(base.name==='Чёрный всадник')scale=Math.min(scale,1.45);
+  const v=0.94+Math.random()*0.12;
+  const hp=Math.round(base.hp*scale*v);
+  const dmgMin=Math.max(2,Math.round(base.dmg[0]*scale*v));
+  const dmgMax=Math.max(dmgMin+1,Math.round(base.dmg[1]*scale*v));
+  return{name:base.name,desc:base.desc,art:base.art,intro:base.intro,hp,maxHp:hp,defense:Math.max(8,Math.round(base.defense*(0.88+scale*0.12))),dmgMin,dmgMax,xp:Math.round(base.xp*(0.95+scale*0.3))};
+}
+function startCombat(id){
+  const b=ENEMIES[id];if(!b)return;
+  takeSnapshot();
+  state.combat={enemy:Object.assign(scaleEnemy(b),{key:id}),log:[],playerDefending:false,playerBuffed:0};
+  state.screen='combat';addCombatLog(b.intro||('Бой: '+b.name+'.'),'story');render();
+}
+function addCombatLog(t,type='combat'){if(!state.combat)return;state.combat.log.push({text:t,type});if(state.combat.log.length>28)state.combat.log.shift();}
+function playerAttack(){
+  const c=state.combat,p=state.player;if(!c)return;
+  let atk=p.weapon+Math.floor(p.level/2)+(c.playerBuffed>0?2:0)+(p.inventory.sword>0?1:0);
+  if(p.trait==='stubborn')atk+=1;if(p.trait==='dreamer')atk-=1;
+  const pen=p.stamina<=0?-3:(p.stamina<3?-1:0);const r=roll(20);const tot=r+atk+pen;
+  p.stamina=clamp(p.stamina-1,0,p.maxStamina);
+  if(r===20||tot>=c.enemy.defense+8){const d=randInt(2,6)+p.weapon*2+Math.floor(p.level/2)+4;c.enemy.hp-=d;state.stats.damageDealt+=d;addCombatLog('Крит! '+d+'.','good');}
+  else if(tot>=c.enemy.defense){const d=randInt(2,6)+p.weapon*2+Math.floor(p.level/2);c.enemy.hp-=d;state.stats.damageDealt+=d;addCombatLog('Удар: '+d+'.','combat');}
+  else addCombatLog('Промах.','info');
+  if(c.playerBuffed>0)c.playerBuffed--;
+  if(c.enemy.hp<=0){endCombat(true);return;}enemyTurn();
+}
+function playerDefend(){state.combat.playerDefending=true;state.player.stamina=clamp(state.player.stamina+1,0,state.player.maxStamina);addCombatLog('Защита.','info');enemyTurn();}
+function playerFlee(){
+  const c=state.combat,p=state.player;if(!c)return;
+  let ch=.4+p.luck*.03+(p.stamina>5?.12:0);if(p.trait==='careful')ch+=.15;
+  if(c.enemy.name.includes('Всадник')||c.enemy.name.includes('Назгул'))ch-=.2;
+  if(Math.random()<ch){addCombatLog('Сбежал!','good');state.stats.battlesFled++;gainXp(2);state.combat=null;state.screen='game';render();saveGame();}
+  else{addCombatLog('Не удалось.','bad');enemyTurn();}
+}
+function playerRing(){
+  const c=state.combat,p=state.player;if(!c||p.inventory.ring<=0)return;
+  state.flags.woreRing=true;state.flags.woreRingCount=(state.flags.woreRingCount||0)+1;
+  addCombatLog('Кольцо.','story');c.playerBuffed=2;enemyTurn();
+}
+function playerRally(){
+  const c=state.combat,p=state.player;if(!c||p.courage<6){addCombatLog('Мало смелости.','info');return;}
+  p.stamina=clamp(p.stamina+3,0,p.maxStamina);c.playerBuffed=1;addCombatLog('Собрался с духом!','good');enemyTurn();
+}
+function playerUseItem(key){
+  const c=state.combat,p=state.player;if(!c||!p.inventory[key]||p.inventory[key]<=0)return;
+  if(key==='herbs'){p.inventory.herbs--;p.hp=clamp(p.hp+12,0,p.maxHp);addCombatLog('+12 HP.','good');}
+  else if(key==='elvenBread'){p.inventory.elvenBread--;p.hp=clamp(p.hp+18,0,p.maxHp);p.hunger=clamp(p.hunger-15,0,p.maxHunger);addCombatLog('Лембас!','good');}
+  else if(key==='food'){addCombatLog('В бою — только травы или лембас.','info');return;}
+  else return;enemyTurn();
+}
+function enemyTurn(){
+  const c=state.combat,p=state.player;if(!c||c.enemy.hp<=0)return;
+  const e=c.enemy;const r=roll(20);let hit=10+Math.floor(p.level/2)+(p.armor>0?2:0);if(c.playerDefending)hit+=4;
+  if(r===1)addCombatLog(e.name+' промах.','info');
+  else if(r+2>=hit){let d=randInt(e.dmgMin,e.dmgMax);if(c.playerDefending)d=Math.max(1,Math.floor(d/2));if(p.armor>0)d=Math.max(1,d-1);p.hp-=d;state.stats.damageTaken+=d;addCombatLog(e.name+': '+d+'.','bad');}
+  else addCombatLog(e.name+' мимо.','info');
+  c.playerDefending=false;
+  if(p.hp<=0){p.hp=0;endCombat(false);return;}render();
+}
+function endCombat(won){
+  if(!state.combat)return;
+  if(won){state.player.xp+=state.combat.enemy.xp;state.stats.battlesWon++;addLog(pick(['Всё стихает. Ты стоишь, слушая собственное дыхание, и руки ещё дрожат.','Враг падает, и тишина после него кажется оглушительной.','Ты опускаешь оружие. Победа пахнет не славой, а потом и железом.'])+' (+'+state.combat.enemy.xp+' опыта)','good');
+    if(chance(.35)){const d=pick(['food','herbs','torch']);state.player.inventory[d]=(state.player.inventory[d]||0)+1;addLog('Дроп: '+ITEMS[d].name+'.','good');}
+    checkLevelUp();state.combat=null;state.screen='game';render();saveGame();
+  }else{state.combat=null;onPlayerDeath('combat');}
+}
+
+function startScene(id){if(!SCENES[id])return;state.scene=id;state.sceneStep=0;state.screen='scene';render();}
+function advanceScene(idx){
+  const sc=SCENES[state.scene];if(!sc){state.screen='game';render();return;}
+  const step=sc.steps[state.sceneStep];
+  if(step&&step.choices&&step.choices[idx]){const ch=step.choices[idx];const hr=state.player.inventory.ring>0||state.player.hasRing;if((ch.requireRing&&!hr)||(ch.requireNoRing&&hr))return;ch.run();}
+  state.sceneStep++;
+  if(state.sceneStep>=sc.steps.length||state.screen==='combat'||state.screen==='end'||state.screen==='death'){
+    if(state.screen!=='combat'&&state.screen!=='end'&&state.screen!=='death'){state.scene=null;state.screen='game';}
+  }
+  render();saveGame();
+}
+function finishGame(ending){state.ending=ending||'default';state.screen='end';state.combat=null;state.scene=null;clearSave();render();}
+
+function buildEnding(){
+  const p=state.player,f=state.flags,name=p?p.name:'хоббит';
+  const tags=[];
+  if(f.destroyedRing)tags.push('Уничтожил Кольцо');
+  if(f.keptRing)tags.push('Сохранил Кольцо');
+  if(f.noRingEnd||state.ending==='no_ring_end')tags.push('Без Кольца');
+  if(f.ringFound)tags.push('Нашёл Кольцо');
+  if(f.leftRingOnRoad)tags.push('Оставил Кольцо');
+  if(f.metEnt)tags.push('Друг Энтов');
+  if(f.rohanFriend)tags.push('Друг Рохана');
+  if(p&&p.trait)tags.push(TRAITS[p.trait].name);
+  let title,subtitle,paragraphs=[];
+  if(state.ending==='destroyed'||f.destroyedRing){
+    title='Конец Кольца';subtitle='Огонь Ородруина';
+    paragraphs=['Золото тихо падает в огонь, и мир замирает. На миг не слышно ни ветра, ни лавы, ни собственного сердца. Потом гора содрогается, как зверь, у которого вырвали зуб, и красный свет внизу вспыхивает в последний раз — ослепительно и чисто.','Далеко на востоке рушатся башни; Глаз закрывается, как закрывается усталый взгляд. Пепел оседает, и сквозь него впервые за много лет проглядывает синева.','Хоббит '+name+' стоит у края, один, с пустой ладонью и душой, лёгкой, как перо. Дом далеко, но теперь у него есть то, чего не было прежде: уверенность, что дом ещё будет.','А где-то в Шире, в круглой норе, зажигают лампу — просто потому, что наступил вечер.'];
+  }else if(state.ending==='kept'||f.keptRing){
+    title='Тень победила';subtitle='Кольцо осталось';
+    paragraphs=['Пальцы не разжимаются. Ты смотришь на лаву, потом на золото — и вдруг понимаешь, что золото красивее. Что оно твоё. Что оно всегда было твоим.','Голос, шептавший всю дорогу, больше не шепчет: он говорит ровно и спокойно, как хозяин. «Хорошо, — произносит он. — Теперь пойдём».','Хоббит '+name+' разворачивается и уходит от пропасти. Ветер уносит последние искры. Глаз над Мордором открывается — и впервые смотрит на тебя не как на врага.','Так заканчиваются многие истории: не битвой и не смертью, а тихим, почти ласковым шагом в сторону.'];
+  }else if(state.ending==='no_ring_end'||f.noRingEnd){
+    title='Зря шёл?';subtitle='Кольца не было';
+    paragraphs=[
+      'Так... какое ещё кольцо? Нету никакого кольца у меня! Зря шёл..',
+      'Хоббит '+name+' стоит у края Ородруина с пустыми руками и долгим путём за спиной.',
+      'Может, Кольцо так и легло в траве у последнего перевала. Может, его и не суждено было нести.',
+      'Пепел оседает на плечах. Где-то далеко Глаз всё ещё ищет — но не здесь, и не тебя.',
+      'Домой всё равно далеко. Но теперь ясно: не каждый поход кончается легендой о Всевластье.'
+    ];
+  }else if(p&&p.hp<=0){
+    title='Путь оборвался';subtitle='Тьма';
+    paragraphs=['Хоббит '+name+' не дошёл до конца. Дорога приняла его тихо, как принимает всех, кто устал раньше, чем кончились мили.','В Шире долго ещё будут ставить на подоконник лишнюю свечу — на случай, если кто-нибудь всё-таки вернётся.'];
+  }else if(state.ending==='stay'||(f.choseStay&&!f.choseSouth&&state.act===1)){
+    title='Дом Элронда';subtitle='Покой Ривенделла';
+    paragraphs=['Хоббит '+name+' остаётся в Долине, где поют водопады.','Война идёт без него. Но иногда по вечерам он вспоминает дорогу от самого Хоббитона и думает: а вдруг?'];
+  }else if(state.act===2||f.choseSouth){
+    title='Долгий путь';subtitle='До края';
+    paragraphs=['От самого Хоббитона до тени Мордора ты прошёл дорогу, о которой в Шире не рассказывают даже на ярмарке: слишком длинную, чтобы в неё поверили.','Имя '+name+' будут помнить тихо — не в песнях, а в том, как хозяйка молча подкладывает лишний ломоть усталым странникам.'];
+  }else{
+    title='Ривенделл';subtitle='Дом Элронда';
+    paragraphs=['Путь от Хоббитона окончен — пока. Долина поёт, и в этой песне нет ни тревоги, ни спешки.'];
+  }
+  return{title,subtitle,paragraphs,tags,keys:state.keyChoices||[]};
+}
+
+function render(){
+  const app=$('app');if(!app)return;if(!state)state=newGameState();
+  if(state.screen==='title'){app.innerHTML=renderTitle();bindTitle();}
+  else if(state.screen==='char'){app.innerHTML=renderChar();bindChar();}
+  else if(state.screen==='game'){app.innerHTML=renderGame();bindGame();scrollLogs();}
+  else if(state.screen==='combat'){app.innerHTML=renderCombat();bindCombat();scrollLogs();}
+  else if(state.screen==='scene'){app.innerHTML=renderScene();bindScene();}
+  else if(state.screen==='death'){app.innerHTML=renderDeath();bindDeath();}
+  else if(state.screen==='end'){app.innerHTML=renderEnd();bindEnd();}
+  paintArt();
+}
+function curArt(){const l=getLocations()[state.locationIndex];return l?l.art:'hobbiton';}
+function paintArt(){
+  const seed=(state.day||1)*13+(state.locationIndex||0)*5+(state.act||1);
+  document.querySelectorAll('canvas[data-art]').forEach(cv=>{const a=cv.dataset.art;
+    try{if(cv.dataset.fixed)PixelArt.draw(cv,a);else PixelArt.draw(cv,a,state.time,state.weather,seed);}catch(e){}});
+  const ec=document.querySelector('canvas[data-enemy]');
+  if(ec){try{PixelArt.combat(ec,curArt(),ec.dataset.enemy,state.time,state.weather);}catch(e){}}
+}
+function scrollLogs(){const l=document.querySelector('.log-box');if(l)l.scrollTop=l.scrollHeight;const c=document.querySelector('.combat-log');if(c)c.scrollTop=c.scrollHeight;}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function renderTitle(){
+  return`<div class="screen title-wrap"><canvas class="pixel-art" data-art="title" data-fixed="1" width="220" height="110" role="img" aria-label="Дорога к Ородруину"></canvas><div class="title-deco"></div>
+    <h1 class="title-main">Поход в Средиземье</h1>
+    <div class="title-sub">От Хоббитона до Ородруина</div>
+    <div class="title-lore"><p>В тихом краю, где холмы круглы, а двери зелены, живёт хоббит, не знающий ни одной песни о дальних землях. Но дороги знают его имя.</p><p>Дорога зовёт — в Ривенделл и, если хватит духу, к тени Мордора.</p></div>
+    <div class="title-deco"></div>
+    <div style="margin-top:18px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn primary" id="btn-new">Начать</button>
+      ${hasSave()?'<button class="btn" id="btn-continue">Продолжить</button>':''}
+    </div></div>`;
+}
+function bindTitle(){
+  $('btn-new').onclick=()=>{state=newGameState();state.screen='char';render();};
+  const c=$('btn-continue');if(c)c.onclick=()=>{if(loadGame()){if(state.screen==='death'||state.screen==='combat'){state.screen='game';state.combat=null;}render();}else{state=newGameState();state.screen='char';render();}};
+}
+function renderChar(){
+  const traits=Object.keys(TRAITS).map(k=>`<div class="trait-card" data-trait="${k}"><h4>${TRAITS[k].name}</h4><p>${TRAITS[k].desc}</p></div>`).join('');
+  return`<div class="screen" style="max-width:640px;margin:3vh auto"><div class="panel">
+    <h2 style="color:var(--gold-bright);font-weight:normal;text-align:center;margin-bottom:12px">Кто ты?</h2>
+    <div style="text-align:center"><label class="form-label" for="input-name">Имя</label>
+      <input type="text" id="input-name" maxlength="20" placeholder="Фродо, Сэм..." autofocus></div>
+    <div class="trait-grid">${traits}</div>
+    <div style="text-align:center;margin-top:18px"><button class="btn primary" id="btn-create" disabled>В путь</button></div>
+  </div></div>`;
+}
+function bindChar(){
+  let selected=null;
+  document.querySelectorAll('.trait-card').forEach(card=>{card.onclick=()=>{document.querySelectorAll('.trait-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');selected=card.dataset.trait;$('btn-create').disabled=false;};});
+  $('btn-create').onclick=()=>{if(!selected)return;const name=(($('input-name')||{}).value||'').trim()||'Фродо';
+    state.player=newPlayer(name,selected);state.screen='game';state.act=1;state.locationIndex=0;state.log=[];
+    addLog(name+', '+TRAITS[selected].name.toLowerCase()+' хоббит из Хоббитона.','story');saveGame();startScene('prologue');};
+}
+function renderStatus(){
+  const p=state.player;const hp=p.hp/p.maxHp*100,st=p.stamina/p.maxStamina*100,hg=p.hunger/p.maxHunger*100,xp=p.xp/p.xpNext*100;
+  return`<div class="status-panel ${hp<30?'low-hp':''}">
+    <div><div class="stat-label"><span>❤️ HP</span><span>${p.hp}/${p.maxHp}</span></div><div class="bar"><div class="bar-fill hp" style="width:${hp}%"></div></div></div>
+    <div><div class="stat-label"><span>⚡</span><span>${p.stamina}/${p.maxStamina}</span></div><div class="bar"><div class="bar-fill stamina" style="width:${st}%"></div></div></div>
+    <div><div class="stat-label"><span>🍖</span><span>${p.hunger}/${p.maxHunger}</span></div><div class="bar"><div class="bar-fill hunger" style="width:${hg}%"></div></div></div>
+    <div><div class="stat-label"><span>⭐${p.level}</span><span>${p.xp}/${p.xpNext}</span></div><div class="bar"><div class="bar-fill xp" style="width:${xp}%"></div></div></div>
+    <div><div class="stat-label"><span>🦁 ${p.courage}</span><span>🍀 ${p.luck}</span></div></div>
+  </div>`;
+}
+function renderEnv(){const t=TIMES[state.time],w=WEATHER[state.weather];return`<div class="environment"><span>${t.icon} ${t.name}</span><span>${w.icon} ${w.name}</span><span>📅 ${state.day}</span></div>`;}
+function renderPath(){
+  const names=getPathNames();let h='<div class="path-progress">';
+  names.forEach((n,i)=>{if(i)h+='<div class="path-line"></div>';const cls=i<state.locationIndex?'done':(i===state.locationIndex?'current':'');h+=`<div class="path-step ${cls}"><div class="dot"></div>${n}</div>`;});
+  return h+'</div>';
+}
+function getActions(){
+  const loc=getLocations()[state.locationIndex];const p=state.player;const a=[];
+  if(!state.usedActions[loc.id+'_search'])a.push({label:'🔍 Обыскать',run:doSearch});
+  a.push({label:'😴 Отдохнуть',run:doRest});
+  if(canEatHere()&&p.inventory.food>0)a.push({label:'🍞 Есть',run:doEat});
+  (loc.specials||[]).forEach(s=>{const k=loc.id+'_sp_'+s.id;if(s.once&&state.usedActions[k])return;
+    a.push({label:s.label,run:()=>{state.usedActions[k]=true;s.run();if(state.screen==='game'){saveGame();render();}}});});
+  a.push({label:'➡️ '+(loc.leaveLabel||'Дальше'),run:doLeave});return a;
+}
+function renderLevelUp(){return`<div class="levelup-panel"><h3>✨ Уровень ${state.player.level}</h3>
+  <button class="btn" data-choice="hp">❤️ +3 HP</button><button class="btn" data-choice="stamina">⚡ +2</button>
+  <button class="btn" data-choice="luck">🍀 +1</button><button class="btn" data-choice="weapon">🗡️ +1 урон</button></div>`;}
+function renderGame(){
+  const loc=getLocations()[state.locationIndex];const p=state.player;
+  let actHtml=state.pendingLevelUp?renderLevelUp():getActions().map((a,i)=>`<button class="btn action-btn" data-idx="${i}">${a.label}</button>`).join('');
+  const inv=p.inventory;const items=[];
+  ['food','herbs','elvenBread','torch','armor','ring','pipeweed','sword'].forEach(k=>{if(inv[k]>0)items.push({key:k,count:inv[k],usable:k==='elvenBread'||k==='herbs'||(k==='food'&&canEatHere())});});
+  const invHtml=items.length?items.map(it=>`<div class="inv-item"><span class="inv-icon">${ITEMS[it.key].icon}</span><div style="flex:1"><span class="inv-name">${ITEMS[it.key].name}</span>
+    <span class="inv-desc">${ITEMS[it.key].desc}</span></div><span class="inv-count">×${it.count}</span>
+    ${it.usable?`<button class="btn small inv-use" data-item="${it.key}">Исп.</button>`:''}</div>`).join(''):'<div style="color:var(--text-dim);font-style:italic">Пусто</div>';
+  const logHtml=state.log.slice(-14).map(l=>`<div class="log-entry ${l.type}">${escapeHtml(l.text)}</div>`).join('');
+  const actBadge=state.act===2?'<div class="act-badge">АКТ II — Юг</div>':'<div class="act-badge">АКТ I — Ривенделл</div>';
+  const cond=getConditionText();
+  return`<div class="screen">${actBadge}${renderPath()}
+    <header class="game-header"><div class="location-name">${loc.name}</div>${renderEnv()}</header>
+    ${renderStatus()}<div class="condition ${cond.cls}">${cond.t}${canEatHere()?' · Здесь можно поесть.':''}</div>
+    <div class="game-main"><canvas class="pixel-art" data-art="${loc.art}" width="220" height="110" role="img" aria-label="${escapeHtml(loc.name)}"></canvas>
+      <div class="description">${loc.desc.map(t=>`<p>${t}</p>`).join('')}<p class="flavor">${flavorText()}</p></div>
+      <div class="actions">${actHtml}</div></div>
+    <div class="game-bottom"><div class="inventory-box"><div class="box-title">Инвентарь</div>${invHtml}</div>
+      <div class="log-box"><div class="box-title">Лог</div>${logHtml}</div></div></div>`;
+}
+function bindGame(){
+  document.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>applyLevelUpChoice(b.dataset.choice));
+  const acts=state.pendingLevelUp?[]:getActions();
+  document.querySelectorAll('.action-btn').forEach(b=>{const i=+b.dataset.idx;b.onclick=()=>{if(acts[i])acts[i].run();};});
+  document.querySelectorAll('.inv-use').forEach(b=>b.onclick=()=>useItem(b.dataset.item));
+}
+function useItem(key){
+  const p=state.player;if(!p.inventory[key]||p.inventory[key]<=0)return;
+  if(key==='food'){if(!canEatHere()){addLog('Обычную еду — только в приютах. В пути — лембас.','info');render();return;}doEat();return;}
+  if(key==='herbs'){p.inventory.herbs--;p.hp=clamp(p.hp+12,0,p.maxHp);addLog('+12 HP.','good');}
+  else if(key==='elvenBread'){p.inventory.elvenBread--;p.hp=clamp(p.hp+20,0,p.maxHp);p.hunger=clamp(p.hunger-25,0,p.maxHunger);addLog('Лембас.','good');}
+  applyHunger();if(p.hp<=0)return;render();saveGame();
+}
+function renderCombat(){
+  const c=state.combat;if(!c){state.screen='game';return render();}
+  const p=state.player,e=c.enemy;const hp=p.hp/p.maxHp*100,st=p.stamina/p.maxStamina*100,ehp=Math.max(0,e.hp/e.maxHp*100);
+  const log=c.log.slice(-10).map(l=>`<div class="log-entry ${l.type}">${escapeHtml(l.text)}</div>`).join('');
+  const sp=[];if(p.inventory.ring>0)sp.push(`<button class="btn" data-combat="ring">💍</button>`);if(p.courage>=6)sp.push(`<button class="btn" data-combat="rally">🦁</button>`);
+  const us=[];if(p.inventory.herbs>0)us.push({k:'herbs',l:'🌿'});if(p.inventory.elvenBread>0)us.push({k:'elvenBread',l:'✨'});
+  const items=us.length?`<div style="width:100%;margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${us.map(u=>`<button class="btn small" data-combat="item" data-item="${u.k}">${u.l}</button>`).join('')}</div>`:'';
+  return`<div class="screen"><header class="game-header"><div class="location-name">⚔️ Бой</div></header>
+    <canvas class="pixel-art banner" data-enemy="${e.key||''}" width="220" height="110" role="img" aria-label="${escapeHtml(e.name)}"></canvas>
+    <div class="combat-arena">
+      <div class="combatant ${hp<30?'low-hp':''}"><h3>${escapeHtml(p.name)}</h3>
+        <div style="display:flex;justify-content:space-between;font-size:.86em;color:var(--text-dim)"><span>HP</span><span>${p.hp}/${p.maxHp}</span></div>
+        <div class="bar"><div class="bar-fill hp" style="width:${hp}%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:.86em;color:var(--text-dim);margin-top:6px"><span>Вынос.</span><span>${p.stamina}/${p.maxStamina}</span></div>
+        <div class="bar"><div class="bar-fill stamina" style="width:${st}%"></div></div></div>
+      <div class="combatant enemy"><h3>${escapeHtml(e.name)}</h3><div class="enemy-art" style="font-size:1.1em;opacity:.85">${e.art}</div>
+        <div class="enemy-desc">${escapeHtml(e.desc)}</div>
+        <div style="display:flex;justify-content:space-between;font-size:.86em;color:var(--text-dim)"><span>HP</span><span>${Math.max(0,e.hp)}/${e.maxHp}</span></div>
+        <div class="bar"><div class="bar-fill hp" style="width:${ehp}%"></div></div></div>
+    </div>
+    <div class="combat-actions">
+      <button class="btn primary" data-combat="attack">🗡️</button><button class="btn" data-combat="defend">🛡️</button>
+      <button class="btn" data-combat="flee">🏃</button>${sp.join('')}${items}
+    </div>
+    <div class="combat-log"><div class="box-title">Бой</div>${log}</div></div>`;
+}
+function bindCombat(){
+  document.querySelectorAll('[data-combat]').forEach(b=>{
+    const a=b.dataset.combat;
+    b.onclick=()=>{if(a==='attack')playerAttack();else if(a==='defend')playerDefend();else if(a==='flee')playerFlee();
+      else if(a==='ring')playerRing();else if(a==='rally')playerRally();else if(a==='item')playerUseItem(b.dataset.item);};
+  });
+}
+function renderScene(){
+  const sc=SCENES[state.scene];if(!sc)return renderGame();
+  const step0=sc.steps[state.sceneStep]||sc.steps[0];const step=Object.assign({},step0,{text:typeof step0.text==='function'?step0.text():step0.text});
+  const hasRing=state.player.inventory.ring>0||state.player.hasRing;
+  const ch=(step.choices||[]).map((c,i)=>({c,i})).filter(o=>(!o.c.requireRing||hasRing)&&(!o.c.requireNoRing||!hasRing));
+  return`<div class="screen scene-wrap"><div class="panel">
+    <canvas class="pixel-art" data-art="${curArt()}" width="220" height="110"></canvas>
+    <h2 style="color:var(--gold-bright);font-weight:normal;text-align:center;margin-bottom:16px">${sc.title}</h2>
+    <div class="scene-text">${step.text.map(t=>`<p>${t}</p>`).join('')}</div>
+    <div class="scene-choices">${ch.map(o=>`<button class="btn choice" data-choice-idx="${o.i}">${o.c.label}</button>`).join('')}</div>
+  </div></div>`;
+}
+function bindScene(){document.querySelectorAll('[data-choice-idx]').forEach(b=>b.onclick=()=>advanceScene(+b.dataset.choiceIdx));}
+function renderDeath(){
+  return`<div class="screen"><div class="modal-overlay"><div class="modal-panel">
+    <h3>Тьма сгустилась</h3>
+    <p>Силы уходят, как вода в песок. Мир сужается до серого пятна, потом до точки. Но дорога, которую ты прошёл, не готова тебя отпустить: судьба ещё может дать шанс.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${state.snapshot?'<button class="btn primary" id="btn-rewind">Очнуться раньше (≈3 шага назад)</button>':''}
+      <button class="btn" id="btn-restart-char">Начать с выбора персонажа</button>
+    </div>
+  </div></div></div>`;
+}
+function bindDeath(){
+  const r=$('btn-rewind');if(r)r.onclick=deathRewind;
+  const c=$('btn-restart-char');if(c)c.onclick=deathRestart;
+}
+function renderEnd(){
+  const end=buildEnding();const p=state.player,s=state.stats;
+  const stats=[{l:'Боёв',v:s.battlesWon},{l:'Уровень',v:p?p.level:'—'},{l:'Шагов',v:s.stepsTaken}];
+  const keysHtml=end.keys.length?`<div class="key-list"><h4 style="color:var(--gold);margin-bottom:6px;font-weight:normal">Ключевые решения</h4><ul>${end.keys.map(k=>`<li>${escapeHtml(k)}</li>`).join('')}</ul></div>`:'';
+  return`<div class="screen end-wrap"><div class="panel">
+    <canvas class="pixel-art" data-art="${state.ending==='stay'||end.title==='Дом Элронда'?'rivendell':(state.ending==='kept'?'mordor_road':'orodrui')}" data-fixed="1" width="220" height="110"></canvas>
+    <h1 class="end-title">${escapeHtml(end.title)}</h1>
+    <div class="end-subtitle">${escapeHtml(end.subtitle)}</div>
+    <div class="end-tags">${end.tags.map(t=>`<span class="end-tag">${t}</span>`).join('')}</div>
+    <div class="end-text">${end.paragraphs.map(t=>`<p>${escapeHtml(t)}</p>`).join('')}</div>
+    ${keysHtml}
+    <div class="end-stats"><h4>Статистика</h4>${stats.map(st=>`<div class="stat-row"><span>${st.l}</span><span>${st.v}</span></div>`).join('')}</div>
+    <button class="btn primary" id="btn-restart">Сначала</button>
+  </div></div>`;
+}
+function bindEnd(){$('btn-restart').onclick=()=>{state=newGameState();state.screen='title';render();};}
+
+state=newGameState();
+render();
+</script>
+</body>
+</html>
